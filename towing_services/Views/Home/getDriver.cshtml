@@ -1,0 +1,444 @@
+﻿@model List<towing_services.Models.DriverViewModel>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta2/js/bootstrap-select.min.js" defer></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" defer rel="stylesheet">
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+    body {
+        background: #F0F0F0;
+        margin-top: 0; /* تأكد من إزالة المسافة العلوية */
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse; /* الدمج بين الخلايا */
+        margin: 20px 0;
+        font-family: 'Arial', sans-serif;
+    }
+
+        .table th {
+            background: #4CAF50;
+            color: black;
+            text-align: left;
+            padding: 15px 95px;
+            font-size: 21px;
+            white-space: nowrap;
+        }
+
+    a:hover {
+        color: black !important
+    }
+
+    button:hover {
+        color: black !important
+    }
+
+    .table td {
+        padding: 8px 0px;
+        text-align: center;
+        font-weight: 500;
+        font-size: 30px;
+    }
+
+    .table tr:nth-child(even) {
+        background-color: #f2f2f2; /* تدرج خفيف في الخلفية للصفوف الزوجية */
+    }
+
+    .table tr:hover {
+        background-color: #ddd; /* تأثير عند التمرير فوق الصف */
+    }
+
+    .table td.empty {
+        background-color: #e0e0e0;
+    }
+
+    .table, .table th, .table td {
+        border: none;
+    }
+
+        .table tr:hover td {
+            background-color: rgba(255, 255, 255, 0.1); /* تغيير الخلفية عند التمرير فوق الصف */
+        }
+
+
+
+
+
+    .btn {
+        font-size: 1.2rem;
+        padding: 12px 24px;
+    }
+
+
+
+    .btn-success {
+        font-size: 1.6rem;
+        background: linear-gradient(145deg, #6eaf4a, #4c9c3e); /* تدرج لوني للزر */
+        color: white; /* النص باللون الأبيض */
+        border: 2px solid #4c9c3e; /* إضافة حد رفيع */
+        padding: 12px 24px; /* المسافات حول النص */
+        border-radius: 30px; /* زوايا مستديرة بشكل أكبر */
+        box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1), -3px -3px 6px rgba(255, 255, 255, 0.1); /* إضافة ظل ناعم */
+        cursor: pointer; /* تغيير المؤشر عند المرور على الزر */
+        transition: all 0.4s ease-in-out; /* إضافة تأثيرات انسيابية */
+    }
+
+        .btn-success:hover {
+            background: linear-gradient(145deg, #4c9c3e, #6eaf4a); /* عكس التدرج اللوني عند التمرير */
+            box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.15), -6px -6px 12px rgba(255, 255, 255, 0.15); /* زيادة الظلال */
+            transform: translateY(-3px); /* رفع الزر قليلاً عند التمرير */
+        }
+
+        .btn-success:active {
+            background: #4c9c3e; /* لون ثابت عند الضغط */
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2); /* تغيير الظلال لتأثير الضغط */
+            transform: translateY(0); /* العودة إلى وضع الزر الطبيعي */
+        }
+
+        .btn-success:focus {
+            outline: none; /* إزالة الحدود عند التركيز */
+            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.5); /* إضافة تأثير ظل عند التركيز */
+        }
+    /* تنسيق شريط التمرير للمتصفحات التي تدعم WebKit */
+    ::-webkit-scrollbar {
+        height: 8px; /* ارتفاع شريط التمرير الأفقي */
+    }
+
+
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+        background: transparent; /* لون شريط التمرير */
+        border-radius: 10px; /* تدوير الزوايا */
+    }
+
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #555; /* لون شريط التمرير عند المرور */
+        }
+
+    @@media (max-width: 768px) {
+        body {
+            margin-left: 0; /* إزالة المسافة لاحتواء الـ navbar على الشاشات الصغيرة */
+        }
+
+        .btn-success {
+            font-size: 1rem;
+            padding: 8px 16px;
+            white-space: nowrap;
+            margin-top: 10px;
+        }
+
+        .table-custom th,
+        .table-custom td {
+            font-size: 1rem;
+            padding: 10px;
+        }
+
+        h2 {
+            font-size: 2rem;
+        }
+
+        .table-wrapper {
+            overflow: auto;
+            margin-bottom: 60px;
+            max-height: 300px;
+        }
+    }
+
+    .table-wrapper {
+        overflow: auto;
+        max-height: 500px;
+    }
+
+
+    .assign-driver-title {
+        text-align: center;
+        font-size: 4rem;
+        font-weight: 700;
+        color: #4CAF50;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 50px;
+        margin-top: 50px;
+        font-family: 'Arial', sans-serif;
+        position: relative;
+    }
+
+        .assign-driver-title::before {
+            content: "";
+            position: absolute;
+            width: 50%;
+            height: 4px;
+            background-color: #4CAF50;
+            bottom: -10px;
+            left: 25%;
+            border-radius: 2px;
+        }
+
+    @@media (max-width: 768px) {
+        .assign-driver-title {
+            font-size: 2.5rem;
+            letter-spacing: 1.5px;
+        }
+    }
+
+    .modal {
+        user-select: none;
+        display: none; /* المودال مخفي بشكل افتراضي */
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6); /* خلفية مظلمة مع شفافية أعلى */
+        animation: fadeIn 0.5s ease-out; /* تحسين مدة وحركة fadeIn */
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 10% auto;
+        padding: 30px;
+        border-radius: 10px;
+        width: 40%;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* إضافة ظل ناعم */
+        animation: slideIn 0.4s ease-out, shake 0.5s ease-out; /* تحسين الأنيميشن */
+    }
+
+    .modal-actions {
+        margin-top: 20px;
+    }
+
+    h2, p {
+        font-size: 30px
+    }
+
+    .close-btn {
+        color: #aaa;
+        font-size: 32px;
+        font-weight: bold;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+    /* حركة fadeIn لتحسين التأثير */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* حركة slideIn لجعل المودال يظهر بسلاسة من الأعلى */
+    @@keyframes slideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    /* حركة الاهتزاز (البربشة) */
+    @@keyframes shake {
+        0% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-10px);
+        }
+
+        50% {
+            transform: translateX(10px);
+        }
+
+        75% {
+            transform: translateX(-10px);
+        }
+
+        100% {
+            transform: translateX(0);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .modal-content {
+            width: 80%; /* المودال يكون 80% من عرض الشاشة في الأجهزة الصغيرة */
+            padding: 20px; /* تقليل الحشو */
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .modal-content {
+            width: 90%; /* المودال يكون 90% من عرض الشاشة في الأجهزة الصغيرة جدًا */
+            padding: 15px; /* تقليل الحشو أكثر */
+            font-size: 14px; /* تقليل حجم النص */
+        }
+
+        .close-btn {
+            font-size: 28px; /* تصغير حجم زر الإغلاق */
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* مسافة بين الأزرار */
+            align-items: center; /* لضبط الأزرار في المنتصف */
+        }
+
+        h2, p {
+            font-size: 21px
+        }
+
+        .modal-actions button {
+            width: 100%; /* جعل الأزرار تأخذ عرض 100% من المودال */
+            padding: 10px;
+            font-size: 16px;
+        }
+    }
+</style>
+
+
+<div class="container-fluid">
+    <div class="table-wrapper ">
+
+
+
+        <h2 class="assign-driver-title">Drivers List</h2>
+        <a asp-action="AddDriver" class="btn btn-success mb-3">Add New Driver</a>
+
+        <table class="table table-custom mt-4  table-responsive " id="ordersTable">
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>TrackingDriver</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Vehicle Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var driver in Model)
+                {
+                    <tr>
+                        <td>@driver.DriverId</td>
+                        <td>@driver.TrackingDriver</td>
+
+                        <td>@driver.Name</td>
+                        <td>@driver.Email</td>
+                        <td>@driver.phone</td>
+                        <td>@driver.VehicleType</td>
+                        <td>
+
+                            <a asp-action="Edit" asp-route-id="@driver.DriverId" class="btn btn-success">Edit</a>
+                            <form asp-action="Delete" asp-route-id="@driver.DriverId" method="post" class="delete-form" style="display:inline;">
+                                <button type="button" class="btn btn-success delete-btn">Delete</button>
+                            </form>
+
+
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Are you sure?</h2>
+        <p>You won't be able to revert this!</p>
+        <div class="modal-actions">
+            <button id="confirmDelete" class="btn btn-success">Yes, delete it!</button>
+            <button id="cancelDelete" class="btn btn-success">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div style="padding:40px">
+
+</div>
+<script>
+
+    $(document).on("click", ".delete-btn", function (e) {
+        e.preventDefault(); // منع إعادة تحميل الصفحة
+        var form = $(this).closest("form"); // اختيار الفورم المرتبط بالزر
+        var actionUrl = form.attr("action"); // رابط الحذف
+
+        // إظهار المودال مع تأثير اهتزاز (بربشة)
+        $("#deleteModal").fadeIn().find(".modal-content").addClass("shake");
+
+        // إغلاق المودال عند الضغط على زر الإغلاق
+        $(".close-btn").click(function () {
+            $("#deleteModal").fadeOut();
+        });
+
+        // إذا تم النقر على "نعم، احذفها!"، يتم إرسال طلب الحذف
+        $("#confirmDelete").click(function () {
+            $.ajax({
+                url: actionUrl,
+                type: "POST",
+                data: form.serialize(),
+                success: function (result) {
+                    $("#deleteModal").fadeOut(); // إخفاء المودال
+                    $(".table-wrapper").html(result); // تحديث الجدول بعد الحذف
+                },
+                error: function (xhr, status, error) {
+                    // إخفاء المودال
+                    $("#deleteModal").fadeOut();
+
+                    // إظهار رسالة خطأ داخل المودال
+                    $("#deleteModal").html('<div class="modal-content"><h2>Error!</h2><p>An error occurred while deleting the driver.</p><button id="closeModal" class="btn btn-secondary">Close</button></div>');
+                    $("#deleteModal").fadeIn(); // إعادة إظهار المودال مع الرسالة
+                    // إغلاق المودال عند الضغط على زر "إغلاق"
+                    $("#closeModal").click(function () {
+                        $("#deleteModal").fadeOut();
+                    });
+                }
+            });
+        });
+
+        // إذا تم النقر على "إلغاء"، يتم إغلاق المودال
+        $("#cancelDelete").click(function () {
+            $("#deleteModal").fadeOut();
+        });
+    });
+
+</script>
+
+
+
+
+
+
+
+
+

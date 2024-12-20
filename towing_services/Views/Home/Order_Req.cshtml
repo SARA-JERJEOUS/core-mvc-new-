@@ -1,0 +1,1208 @@
+﻿@using Dal
+@model Dal.Customer
+@{ var order = ViewBag.Order as Order; }
+
+<!-- إضافة مكتبة Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<!-- إضافة مكتبة Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+    }
+    /* تنسيق القائمة المنسدلة */
+    .nav-item .dropdown-menu {
+        background-color: #f0f0f0; /* لون الخلفية */
+        border: none;
+        border-radius: 20px; /* زوايا مستديرة */
+        box-shadow: 0px 8px 15px rgb(6 34 57 / 0.10); /* ظل ناعم */
+        padding: 4px;
+        /* إبعاد القائمة عن الحافة اليمنى */
+        margin-left: -50px; /* إضافة مسافة من الحافة اليمنى */
+    }
+
+
+    /* عناصر القائمة المنسدلة */
+    .dropdown-item {
+        font-size: 18px;
+        color: #333;
+        padding: 10px 20px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+        /* تأثير عند المرور على عنصر القائمة المنسدلة */
+        .dropdown-item:hover {
+            background-color: #0b2644; /* لون الخلفية عند المرور */
+            color: #fff; /* لون النص عند المرور */
+            transform: scale(1.05); /* تكبير بسيط */
+        }
+
+    /* تصميم السهم */
+    .nav-link.dropdown-toggle::after {
+        content: ' ▼'; /* إضافة سهم */
+        font-size: 12px;
+        color: inherit; /* نفس لون النص */
+        margin-left: 5px;
+        transition: transform 0.3s ease;
+    }
+
+    /* دوران السهم عند الفتح */
+    .nav-link.dropdown-toggle[aria-expanded="true"]::after {
+        transform: rotate(180deg);
+    }
+
+    /* تأثير الظهور التدريجي للقائمة */
+    .nav-item .dropdown-menu {
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+        /* عند عرض القائمة */
+        .nav-item .dropdown-menu.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    .control-label {
+        color: black !important;
+        font: bolder;
+        font-size: 26px
+    }
+
+    .text-danger {
+        color: blue !important;
+        font-size: 22px
+    }
+
+    @@keyframes slideUp {
+        0% {
+            transform: translateY(30px); /* يبدأ من الأسفل */
+            opacity: 0; /* الشفافية تكون صفر */
+        }
+
+        100% {
+            transform: translateY(0); /* يصل إلى مكانه الطبيعي */
+            opacity: 1; /* الشفافية تصبح 1 */
+        }
+    }
+
+    /* تطبيق الحركة على الكارد */
+    .card {
+        animation: slideUp 0.8s ease-in-out; /* التأثير يستمر لمدة 0.8 ثانية */
+    }
+
+    .text-center {
+        padding: 10px
+    }
+
+    @@media (max-width: 768px) {
+        #map {
+            height: 300px; /* يمكن تقليص الارتفاع على الشاشات الصغيرة */
+        }
+
+        .hero-text {
+            padding-bottom: 13px;
+            font-size: 10px
+        }
+    }
+    /***********************************************/
+    .wave-background {
+        height: 5vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hero-text span:first-child {
+        color: #033E3E; /* لون الحرف الأول */
+    }
+
+    .hero-text span:nth-child(10) {
+        color: #033E3E; /* لون الحرف الأول */
+    }
+
+
+
+    @@keyframes waveEffect {
+        0% {
+            background-position: 20% 0;
+        }
+
+        100% {
+            background-position: 0 0;
+        }
+    }
+
+    @@keyframes colorShift {
+        0% {
+            background: linear-gradient(46deg, #162252, #368BC1 50%, #3090C7);
+        }
+
+        100% {
+            background: linear-gradient(46deg, #3090C7, #368BC1 50%, #162252);
+        }
+    }
+
+
+    /* التنسيق الأساسي للنص */
+    .hero-text {
+        font-weight: bold;
+        text-align: center;
+        display: inline-block;
+        word-wrap: break-word; /* يضمن أن النص ينكسر بشكل صحيح داخل الـ div */
+    }
+
+        /* تجزئة الكلمة إلى حروف */
+        .hero-text span {
+            opacity: 0; /* إخفاء الحروف في البداية */
+            display: inline-block;
+            transform: translateY(-30px); /* يبدأ من أعلى */
+            animation: showLetter 1s ease-out forwards;
+            font-size: 4rem;
+            color: #a5c9e1;
+        }
+
+            /* إضافة تأخير بين الحروف */
+            .hero-text span:nth-child(1) {
+                animation-delay: 0s;
+            }
+
+            .hero-text span:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .hero-text span:nth-child(3) {
+                animation-delay: 0.4s;
+            }
+
+            .hero-text span:nth-child(4) {
+                animation-delay: 0.6s;
+            }
+
+            .hero-text span:nth-child(5) {
+                animation-delay: 0.8s;
+            }
+
+            .hero-text span:nth-child(6) {
+                animation-delay: 1s;
+            }
+
+            .hero-text span:nth-child(7) {
+                animation-delay: 1.2s;
+            }
+
+            .hero-text span:nth-child(8) {
+                animation-delay: 1.4s;
+            }
+
+            .hero-text span:nth-child(9) {
+                animation-delay: 1.6s;
+            }
+
+            .hero-text span:nth-child(10) {
+                animation-delay: 1.8s;
+            }
+
+            .hero-text span:nth-child(11) {
+                animation-delay: 2s;
+            }
+
+            .hero-text span:nth-child(12) {
+                animation-delay: 2.2s;
+            }
+
+            .hero-text span:nth-child(13) {
+                animation-delay: 2.4s;
+            }
+
+            .hero-text span:nth-child(14) {
+                animation-delay: 2.6s;
+            }
+
+            .hero-text span:nth-child(15) {
+                animation-delay: 2.8s;
+            }
+
+            .hero-text span:nth-child(16) {
+                animation-delay: 3s;
+            }
+
+    /* الفراغ بين الكلمتين */
+    .space {
+        display: inline-block;
+        width: 18px; /* تعديل عرض الفراغ */
+    }
+
+    /* تأثير الأنيميشن للحروف */
+    @@keyframes showLetter {
+        0% {
+            opacity: 0;
+            transform: translateY(-30px); /* يبدأ من أعلى */
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0); /* يظهر في مكانه الطبيعي */
+        }
+    }
+
+    /* استجابة للشاشات الصغيرة */
+    @@media (max-width: 915px) {
+        .hero-text span {
+            font-size: 3rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .hero-text span {
+            font-size: 2rem;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .form-control {
+            font-size: 17px;
+        }
+
+        .control-label {
+            font-size: 17px;
+        }
+
+        .text-danger {
+            color: red !important;
+            font-size: 15px
+        }
+    }
+    /************************************************/
+    .sty {
+        padding-top: 3%
+    }
+
+    .form-control {
+        font-size: 25px;
+        background-color: transparent;
+        border: none; 
+        border-bottom: 3px solid #007bff; 
+        border-radius: 0; 
+    }
+
+        .form-control:focus {
+            border-bottom: 3px solid #033E3E; 
+            box-shadow: none; 
+            background-color: transparent;
+        }
+    /*****************************/
+    .card {
+        background: linear-gradient(135deg, #f4f4f4, #ffffff);
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+        max-width: 680px;
+        margin: 0 auto;
+        box-shadow: 4px 4px 10px #3b5bdb, -4px -4px 10px #033E3E;
+    }
+
+
+
+
+    .toggle-buttons {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+        .toggle-buttons button {
+            margin: 0 5px;
+        }
+
+    .section {
+        padding: 15px;
+        border-radius: 10px;
+        background-color: #f8f9fa;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+
+    /* تعديل الخريطة لكي لا تأخذ مكانًا إضافيًا عند إخفائها */
+    #map {
+        position: absolute;
+        top: -9999px; /* إخفاء الخريطة بعيدًا عن الصفحة */
+        left: 0;
+        width: 100%;
+        height: 300px; /* يمكنك تغيير الحجم كما يناسبك */
+        z-index: 1; /* تأكد من أن الخريطة ليست فوق المحتوى */
+    }
+
+        /* عند إظهار الخريطة */
+        #map.visible {
+            visibility: visible;
+            height: 300px; /* تعيين ارتفاع الخريطة عند الإظهار */
+        }
+    /***********************/
+
+
+    /* زر */
+    .btn {
+        position: relative;
+        padding: 0.70em 1.5em;
+        background-color: rgb(6 167 225);
+        border: 4px solid #fff; /* تحديد حدود الزر بلون أبيض */
+        color: black;
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 5px;
+        overflow: hidden;
+        transition: color 0.3s, border-color 0.3s;
+        z-index: 1;
+    }
+
+        .btn::before {
+            content: ''; 
+            position: absolute;
+            top: 0;
+            left: -100%; 
+            width: 100%;
+            height: 100%;
+            background-color: #15317E;
+            transition: left 0.5s ease; 
+            z-index: -1; 
+        }
+
+        .btn:hover {
+            color: black;
+            border-color: #3b5bdb; 
+        }
+
+            .btn:hover::before {
+                left: 0; 
+            }
+
+        .btn:hover {
+            color: #ddd;
+        }
+    /******************************/
+
+    optgroup {
+        font-weight: bold;
+        color: #3b5bdb; 
+        font-size: 1.60rem;
+    }        optgroup[label="Tow Truck Favourites"]:hover {
+            color: #fff;
+            background-color: #3b5bdb;
+        }
+    .container {
+        padding: 10px 0px
+    }
+</style>
+
+<div style="padding:10px">
+
+</div>
+
+<div class="container">
+    <div class="wave-background">
+        <div class="hero-text d-inline-block " style="max-width: 930px;">
+            <span>S</span>
+            <span>e</span>
+            <span>r</span>
+            <span>v</span>
+            <span>i</span>
+            <span>c</span>
+            <span>e</span>
+            <span>s</span>
+            <span class="space"></span>
+            <span>R</span>
+            <span>e</span>
+            <span>q</span>
+            <span>u</span>
+            <span>e</span>
+            <span>s</span>
+            <span>t</span>
+        </div>
+    </div>
+</div>
+<div style="padding:15px">
+
+</div>
+
+<div class="container sty">
+    <div class="card">
+        <div class="row justify-content-center">
+            <!-- عرض رسالة النجاح -->
+            @if (ViewData["SuccessMessage"] != null)
+            {
+                <div class="col-md-12">
+                    <div class="alert alert-light text-center">
+                        <strong>@ViewData["SuccessMessage"]</strong>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- الفورم -->
+                <div class="">
+                    <form asp-action="Order_Req" method="post">
+                        @Html.ValidationSummary(true)
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="toggle-buttons">
+                            <button type="button" class="btn " onclick="showSection('customer')">Client Details</button>
+                            <button type="button" class="btn " onclick="showSection('order')">Order Details</button>
+                        </div>
+
+                        <!-- البيانات و الخريطة في عمودين -->
+                        <div class="section" style="gap: 30px;" id="customer-section">
+                            <div>
+                                <div class="form-group">
+                                    <label asp-for="Name" class="control-label">Name</label>
+                                    <input asp-for="Name" class="form-control" style="width: 100%;" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Phone">Phone</label>
+                                    <div class="input-group">
+                                        <!-- اختيار مفتاح الولاية -->
+                                        <select id="areaCode" class="form-control" required>
+                                            <option value="+1 (205) ">+1 205 (Alabama)</option>
+                                            <option value="+1 (907) ">+1 907 (Alaska)</option>
+                                            <option value="+1 (480) ">+1 480 (Arizona)</option>
+                                            <option value="+1 (501) ">+1 501 (Arkansas)</option>
+                                            <option value="+1 (310) ">+1 310 (California)</option>
+                                            <option value="+1 (303) ">+1 303 (Colorado)</option>
+                                            <option value="+1 (203) ">+1 203 (Connecticut)</option>
+                                            <option value="+1 (302) ">+1 302 (Delaware)</option>
+                                            <option value="+1 (305) ">+1 305 (Florida)</option>
+                                            <option value="+1 (470) ">+1 470 (Georgia)</option>
+                                            <option value="+1 (808) ">+1 808 (Hawaii)</option>
+                                            <option value="+1 (208) ">+1 208 (Idaho)</option>
+                                            <option value="+1 (312) ">+1 312 (Illinois)</option>
+                                            <option value="+1 (317) ">+1 317 (Indiana)</option>
+                                            <option value="+1 (515) ">+1 515 (Iowa)</option>
+                                            <option value="+1 (913) ">+1 913 (Kansas)</option>
+                                            <option value="+1 (502) ">+1 502 (Kentucky)</option>
+                                            <option value="+1 (225) ">+1 225 (Louisiana)</option>
+                                            <option value="+1 (207) ">+1 207 (Maine)</option>
+                                            <option value="+1 (301) ">+1 301 (Maryland)</option>
+                                            <option value="+1 (617) ">+1 617 (Massachusetts)</option>
+                                            <option value="+1 (231) ">+1 231 (Michigan)</option>
+                                            <option value="+1 (612) ">+1 612 (Minnesota)</option>
+                                            <option value="+1 (662) ">+1 662 (Mississippi)</option>
+                                            <option value="+1 (314) ">+1 314 (Missouri)</option>
+                                            <option value="+1 (406) ">+1 406 (Montana)</option>
+                                            <option value="+1 (231) ">+1 231 (Nebraska)</option>
+                                            <option value="+1 (702) ">+1 702 (Nevada)</option>
+                                            <option value="+1 (603) ">+1 603 (New Hampshire)</option>
+                                            <option value="+1 (973) ">+1 973 (New Jersey)</option>
+                                            <option value="+1 (505) ">+1 505 (New Mexico)</option>
+                                            <option value="+1 (212) ">+1 212 (New York)</option>
+                                            <option value="+1 (252) ">+1 252 (North Carolina)</option>
+                                            <option value="+1 (701) ">+1 701 (North Dakota)</option>
+                                            <option value="+1 (216) ">+1 216 (Ohio)</option>
+                                            <option value="+1 (405) ">+1 405 (Oklahoma)</option>
+                                            <option value="+1 (503) ">+1 503 (Oregon)</option>
+                                            <option value="+1 (215) ">+1 215 (Pennsylvania)</option>
+                                            <option value="+1 (401) ">+1 401 (Rhode Island)</option>
+                                            <option value="+1 (615) ">+1 615 (Tennessee)</option>
+                                            <option value="+1 (512) ">+1 512 (Texas)</option>
+                                            <option value="+1 (801) ">+1 801 (Utah)</option>
+                                            <option value="+1 (802) ">+1 802 (Vermont)</option>
+                                            <option value="+1 (703) " selected>+1 703 (Virginia)</option>
+                                            <option value="+1 (206) ">+1 206 (Washington)</option>
+                                            <option value="+1 (304) ">+1 304 (West Virginia)</option>
+                                            <option value="+1 (414) ">+1 414 (Wisconsin)</option>
+                                            <option value="+1 (307) ">+1 307 (Wyoming)</option>
+
+                                        </select>
+                                        <input type="text" id="phoneNumber" name="Phone" class="form-control" placeholder="Enter your phone number" required />
+                                    </div>
+                                    <span id="phoneError" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Email" class="control-label">Email</label>
+                                    <input asp-for="Email" class="form-control" style="width: 100%;" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Address" class="control-label">Address</label>
+                                    <input asp-for="Address" class="form-control" style="width: 100%;" />
+                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="VIN" class="control-label">VIN Number</label>
+                                    <input asp-for="VIN" class="form-control" id="VIN" style="width: 100%;" />
+                                    <span id="error-vin" class="text-danger" style="display: none;">This field is required.</span>
+
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Color_model_name" class="control-label">Color_model_name of vehicle</label>
+                                    <input asp-for="Color_model_name" class="form-control" id="Color_model_name" style="width: 100%;" />
+                                    <span id="error-color-model" class="text-danger" style="display: none;">Color Model Name is required.</span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Message_or_inquiry" class="control-label">Message</label>
+                                    <textarea asp-for="Message_or_inquiry" class="form-control" id="Message_or_inquiry" style="width: 100%;"></textarea>
+                                    <span id="error-message" class="text-danger" style="display: none;">Message or Inquiry is required.</span>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- عمود بيانات الطلب على اليمين -->
+                        <div class="section" id="order-section" style="display: none;">
+                            <div class="form-group">
+                                <label asp-for="@order.Status" class="control-label">Order Status</label>
+                                <input asp-for="@order.Status" class="form-control" readonly value="New Request" />
+                                <span asp-validation-for="@order.Status" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="@order.VehicleType" class="control-label">Vehicle Type</label>
+                                <select asp-for="@order.VehicleType" class="form-control custom-select" id="VehicleType">
+                                    <option value="Tow Truck">Tow Truck</option>
+
+                                    <!-- قائمة فرعية تحتوي على فئات Tow Truck -->
+                                    <optgroup label="Tow Truck Favourites">
+                                        <option value="Flatbed">Flatbed</option>
+                                        <option value="Heavy Duty">Heavy Duty</option>
+                                        <option value="Wheel Lift">Wheel Lift</option>
+                                    </optgroup>
+                                    <!-- خيارات أخرى يمكن اختيارها -->
+                                    <option value="Other Vehicle">
+                                        Jump Start Truck
+                                    </option>
+
+                                    <option value="Other Vehicle">
+                                        Boom Truck
+                                    </option>
+                                </select>
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <label asp-for="@order.PickupLocation" class="control-label">Pickup Location</label>
+                                <textarea asp-for="@order.PickupLocation" class="form-control" id="PickupLocation" style="width: 100%; height: 25px;"></textarea>
+                                <span asp-validation-for="@order.DropoffLocation" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="@order.DropoffLocation" class="control-label">Dropoff Location</label>
+                                <textarea asp-for="@order.DropoffLocation" class="form-control" id="DropoffLocation" style="width: 100%; height: 25px;"></textarea>
+                                <span asp-validation-for="@order.PickupLocation" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="@order.Distance" class="control-label">Distance (miles)</label>
+                                <input asp-for="@order.Distance" class="form-control" id="Distance" readonly style="width: 100%;" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="@order.DID" class="control-label">DeadHead ($)</label>
+                                <input asp-for="@order.DID" class="form-control" id="DID" readonly style="width: 100%;" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="@order.TotalCost" class="control-label">Total Cost ($)</label>
+                                <input asp-for="@order.TotalCost" class="form-control" id="TotalCost" readonly style="width: 100%;" />
+                            </div>
+
+
+
+                        </div>
+
+                        <!-- زر الإرسال في الأسفل -->
+                        <div class="form-group text-center mt-3">
+
+                            <!-- الزر في HTML -->
+                            <button type="submit" class="btn hhh" onclick="validateForm(event)">Order Request</button>
+                        </div>
+
+
+                        <!-- الخريطة في أسفل الصفحة -->
+                        <div class="col-md-12" style=" ">
+                            <div class="form-group">
+                                <div id="map" style="height: 300px; width: 100%; border-radius: 40px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); "></div> <!-- هنا جعلنا الخريطة مخفية عند تحميل الصفحة -->
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<div style="padding:80px">
+
+</div>
+
+
+
+
+<script>
+
+    const areaCode = document.getElementById("areaCode");
+    const phoneNumber = document.getElementById("phoneNumber");
+
+    // عند تغيير مفتاح الدولة، يتم تعيين الحقل إلى مفتاح الدولة فقط
+    areaCode.addEventListener("change", function () {
+        phoneNumber.value = areaCode.value; // تعيين الحقل بمفتاح الدولة الجديد
+    });
+
+    // تحديث الرقم عند الكتابة
+    phoneNumber.addEventListener("input", function () {
+        let currentValue = phoneNumber.value;
+
+        // إذا كانت القيمة فارغة، إعادة مفتاح الدولة فقط
+        if (currentValue.trim() === '') {
+            phoneNumber.value = areaCode.value;
+            return;
+        }
+
+        // إزالة أي تكرارات لمفتاح الدولة داخل النص
+        let sanitizedValue = currentValue.replace(new RegExp(`^(${areaCode.value})+`), areaCode.value);
+
+        // تحديث الحقل بالقيمة المعالجة
+        phoneNumber.value = sanitizedValue;
+    });
+
+    // التأكد من وجود مفتاح الدولة عند فقدان التركيز
+    phoneNumber.addEventListener("focusout", function () {
+        if (phoneNumber.value.trim() === '' || phoneNumber.value === areaCode.value) {
+            phoneNumber.value = areaCode.value; // إعادة مفتاح الدولة فقط إذا كان الحقل فارغًا
+        }
+    });
+
+    // تحديث حقل مفتاح الدولة ليعرض المفتاح فقط عند تغييره
+    areaCode.addEventListener("change", function () {
+        const selectedOption = areaCode.options[areaCode.selectedIndex];
+        areaCode.value = selectedOption.value; // عرض المفتاح فقط
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        const areaCode = document.getElementById("areaCode");
+        const phoneNumber = document.getElementById("phoneNumber");
+
+        // تعيين مفتاح الولاية الافتراضي عند تحميل الصفحة
+        phoneNumber.value = areaCode.value;
+
+        // عند تغيير مفتاح الولاية، تحديث الرقم
+        areaCode.addEventListener("change", function () {
+            phoneNumber.value = areaCode.value; // تعيين الحقل بمفتاح الولاية
+        });
+    });
+
+    //     document.addEventListener("DOMContentLoaded", function () {
+    //    const areaCode = document.getElementById("areaCode");
+    //    const phoneNumber = document.getElementById("phoneNumber");
+    //    const form = document.querySelector("form"); // استبدل "form" بمحدد النموذج الخاص بك إذا كان لديك أكثر من نموذج
+
+    //    // تحديث الرقم مع رمز الدولة عند تغيير الرمز
+    //    areaCode.addEventListener("change", function () {
+    //        updatePhoneNumber();
+    //    });
+
+    //    // تحديث الرقم مع رمز الدولة عند إدخال الرقم
+    //    phoneNumber.addEventListener("input", function () {
+    //        updatePhoneNumber();
+    //    });
+
+    //    // منع الإرسال إذا كان الرقم غير صالح
+    //    form.addEventListener("submit", function (event) {
+    //        if (!isPhoneNumberValid()) {
+    //            event.preventDefault(); // منع إرسال النموذج
+    //            alert("Please enter a valid phone number.");
+    //        }
+    //    });
+
+    //    function updatePhoneNumber() {
+    //        const code = areaCode.value;
+    //        const number = phoneNumber.value.replace(new RegExp(`^${code}`), "").trim(); // إزالة الرمز القديم
+    //        phoneNumber.value = `${code} ${number}`; // دمج الرمز الجديد
+    //    }
+
+    //    function isPhoneNumberValid() {
+    //        const code = areaCode.value;
+    //        const number = phoneNumber.value.replace(code, "").trim(); // إزالة رمز الدولة للتحقق فقط من الرقم
+    //        const phoneRegex = /^[0-9]{6,15}$/; // التحقق من الأرقام بين 6 و15 رقم
+    //        return phoneRegex.test(number); // صحيح إذا كان الرقم يطابق النمط
+    //    }
+    //});
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const areaCode = document.getElementById("areaCode");
+        const phoneNumber = document.getElementById("phoneNumber");
+        const errorSpan = document.getElementById("phoneError");
+        const form = document.querySelector("form"); // استبدل "form" بمحدد النموذج الخاص بك إذا لزم
+
+        // تحديث الرقم مع رمز الدولة
+        areaCode.addEventListener("change", function () {
+            phoneNumber.value = areaCode.value;
+        });
+
+        // تحديث الرقم عند الكتابة
+        phoneNumber.addEventListener("input", function () {
+            let currentValue = phoneNumber.value;
+
+            // إذا كانت القيمة فارغة، إعادة مفتاح الدولة فقط
+            if (currentValue.trim() === '') {
+                phoneNumber.value = areaCode.value;
+                return;
+            }
+
+            // إزالة أي تكرارات لمفتاح الدولة داخل النص
+            let sanitizedValue = currentValue.replace(new RegExp(`^(${areaCode.value})+`), areaCode.value);
+            phoneNumber.value = sanitizedValue;
+
+            clearError(); // إزالة رسالة الخطأ عند الكتابة
+        });
+
+        // منع الإرسال إذا كان الرقم غير صالح
+        form.addEventListener("submit", function (event) {
+            if (!isPhoneNumberValid()) {
+                event.preventDefault(); // منع إرسال النموذج
+                showError("Please enter a valid phone number."); // عرض رسالة الخطأ
+            }
+        });
+
+        // دالة لإظهار رسالة الخطأ
+        function showError(message) {
+            errorSpan.textContent = message;
+        }
+
+        // دالة لإزالة رسالة الخطأ
+        function clearError() {
+            errorSpan.textContent = "";
+        }
+
+        // التحقق من صلاحية رقم الهاتف
+        function isPhoneNumberValid() {
+            const code = areaCode.value;
+            const number = phoneNumber.value.replace(code, "").trim(); // إزالة رمز الدولة للتحقق فقط من الرقم
+            const phoneRegex = /^[0-9]{6,15}$/; // التحقق من الأرقام بين 6 و15 رقم
+            return phoneRegex.test(number);
+        }
+    });
+
+
+    /**
+     * **************************
+     */
+    function validateForm(event) {
+        // جلب القيم من الحقول
+        const vin = document.getElementById("VIN").value.trim();
+        const colorModelName = document.getElementById("Color_model_name").value.trim();
+        const messageInquiry = document.getElementById("Message_or_inquiry").value.trim();
+
+        // جلب عناصر عرض الأخطاء
+        const errorVin = document.getElementById("error-vin");
+        const errorColorModel = document.getElementById("error-color-model");
+        const errorMessage = document.getElementById("error-message");
+
+        // تتبع وجود الأخطاء
+        let hasError = false;
+
+        // التحقق من الحقول
+        if (!vin) {
+            errorVin.style.display = "block";
+            hasError = true;
+        } else {
+            errorVin.style.display = "none";
+        }
+
+        if (!colorModelName) {
+            errorColorModel.style.display = "block";
+            hasError = true;
+        } else {
+            errorColorModel.style.display = "none";
+        }
+
+        if (!messageInquiry) {
+            errorMessage.style.display = "block";
+            hasError = true;
+        } else {
+            errorMessage.style.display = "none";
+        }
+
+        // منع إرسال النموذج إذا كان هناك خطأ
+        if (hasError) {
+            event.preventDefault();
+        }
+    }
+
+
+
+
+
+
+    /******************************* */
+
+
+    function showSection(section) {
+        // إخفاء جميع الأقسام
+        document.getElementById('customer-section').style.display = 'none';
+        document.getElementById('order-section').style.display = 'none';
+
+        var mapElement = document.getElementById('map');
+
+        // إذا كان القسم المطلوب هو "order"، نقوم بإظهار الخريطة
+        if (section === 'order') {
+            document.getElementById('order-section').style.display = 'block';
+
+            // تعيين الخريطة في المكان الصحيح داخل القسم
+            mapElement.style.position = 'relative';
+            mapElement.style.top = '0';
+
+            // تأكد من أن الخريطة تظهر بشكل صحيح بعد التغيير
+            setTimeout(function () {
+                // إذا كنت تستخدم مكتبة Leaflet، قم بتحديث حجم الخريطة
+                if (typeof L !== 'undefined') {
+                    map.invalidateSize(); // لتحديث حجم الخريطة
+                }
+            }, 100);
+        } else if (section === 'customer') {
+            document.getElementById('customer-section').style.display = 'block';
+            mapElement.style.position = 'absolute'; // إخفاء الخريطة مرة أخرى بعيدًا
+            mapElement.style.top = '-9999px'; // إخفاء الخريطة
+        }
+    }
+
+
+
+
+    /*************map************ */
+    var map = L.map('map').setView([37.7749, -122.4194], 13); // Default to San Francisco
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19, minZoom: 3
+    }).addTo(map);
+
+    var pickupMarker, dropoffMarker;
+    var pickupLatLng, dropoffLatLng;
+
+    // Function to get address in English
+    function getAddress(lat, lng, callback) {
+        var url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=en`;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                callback(data.display_name || "Unknown location");
+            })
+            .catch(() => callback("Unknown location"));
+    }
+
+    // Update the location and address in the input field
+    function updateLocation(marker, latlng, inputId) {
+        marker.setLatLng(latlng);
+        getAddress(latlng.lat, latlng.lng, function (address) {
+            document.getElementById(inputId).value = address;
+        });
+        calculateDistanceAndCost();
+    }
+
+    // Calculate distance and cost
+    function calculateDistanceAndCost() {
+        if (pickupLatLng && dropoffLatLng) {
+            var distanceInMeters = pickupLatLng.distanceTo(dropoffLatLng);
+            var distanceInMiles = distanceInMeters / 1609.344; // Convert to miles
+            var DID = (distanceInMiles / 2) * 10;
+            var totalCost = (distanceInMiles * 10) + DID; // Example: $10 per mile
+
+            document.getElementById('Distance').value = distanceInMiles.toFixed(2);
+            document.getElementById('TotalCost').value = totalCost.toFixed(2);
+            document.getElementById('DID').value = DID.toFixed(2);
+        }
+    }
+
+    // Enable drag and update fields on drag end
+    function enableDragToUpdate(marker, latlngVar, inputId) {
+        marker.on('dragend', function (event) {
+            var newLatLng = event.target.getLatLng();
+            latlngVar.lat = newLatLng.lat;
+            latlngVar.lng = newLatLng.lng;
+            updateLocation(marker, newLatLng, inputId);
+        });
+    }
+
+    // Handle map click to set pickup or dropoff
+    map.on('click', function (e) {
+        if (!pickupMarker) {
+            pickupMarker = L.marker(e.latlng, { draggable: true }).addTo(map);
+            pickupLatLng = e.latlng;
+            updateLocation(pickupMarker, e.latlng, 'PickupLocation');
+            enableDragToUpdate(pickupMarker, pickupLatLng, 'PickupLocation');
+        } else if (!dropoffMarker) {
+            dropoffMarker = L.marker(e.latlng, { draggable: true }).addTo(map);
+            dropoffLatLng = e.latlng;
+            updateLocation(dropoffMarker, e.latlng, 'DropoffLocation');
+            enableDragToUpdate(dropoffMarker, dropoffLatLng, 'DropoffLocation');
+            calculateDistanceAndCost();
+        }
+    });
+
+    // Handle address input fields for pickup and dropoff
+    document.getElementById('PickupLocation').addEventListener('change', function () {
+        var address = this.value;
+        var url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json`;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data[0]) {
+                    pickupLatLng = L.latLng(data[0].lat, data[0].lon);
+                    map.setView(pickupLatLng, 13); // Move the map to the new location
+                    if (pickupMarker) {
+                        updateLocation(pickupMarker, pickupLatLng, 'PickupLocation');
+                    } else {
+                        pickupMarker = L.marker(pickupLatLng, { draggable: true }).addTo(map);
+                        updateLocation(pickupMarker, pickupLatLng, 'PickupLocation');
+                        enableDragToUpdate(pickupMarker, pickupLatLng, 'PickupLocation');
+                    }
+                    calculateDistanceAndCost();
+                } else {
+                    alert("Unable to find location.");
+                }
+            });
+    });
+
+    document.getElementById('DropoffLocation').addEventListener('change', function () {
+        var address = this.value;
+        var url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json`;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data[0]) {
+                    dropoffLatLng = L.latLng(data[0].lat, data[0].lon);
+                    map.setView(dropoffLatLng, 13); // Move the map to the new location
+                    if (dropoffMarker) {
+                        updateLocation(dropoffMarker, dropoffLatLng, 'DropoffLocation');
+                    } else {
+                        dropoffMarker = L.marker(dropoffLatLng, { draggable: true }).addTo(map);
+                        updateLocation(dropoffMarker, dropoffLatLng, 'DropoffLocation');
+                        enableDragToUpdate(dropoffMarker, dropoffLatLng, 'DropoffLocation');
+                    }
+                    calculateDistanceAndCost();
+                } else {
+                    alert("Unable to find location.");
+                }
+            });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@*<script>
+        //var map = L.map('map').setView([37.7749, -122.4194], 13); // Default to San Francisco
+        //L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        //    maxZoom: 19
+        //}).addTo(map);
+
+        //var pickupMarker, dropoffMarker;
+        //var pickupLatLng, dropoffLatLng;
+
+        //// Function to get address in English
+        //function getAddress(lat, lng, callback) {
+        //    var url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=en`;
+        //    fetch(url)
+        //        .then(response => response.json())
+        //        .then(data => {
+        //            callback(data.display_name || "Unknown location");
+        //        })
+        //        .catch(() => callback("Unknown location"));
+        //}
+
+        //// Update the location and address in the input field
+        //function updateLocation(marker, latlng, inputId) {
+        //    marker.setLatLng(latlng);
+        //    getAddress(latlng.lat, latlng.lng, function (address) {
+        //        document.getElementById(inputId).value = address;
+        //    });
+        //}
+
+        //// Calculate distance and cost
+        //function calculateDistanceAndCost() {
+        //    if (pickupLatLng && dropoffLatLng) {
+        //        var distanceInMeters = pickupLatLng.distanceTo(dropoffLatLng);
+        //        var distanceInMiles = distanceInMeters / 1.609; // Convert to miles
+        //        var DID = (distanceInMiles / 2) * 10;
+
+        //        var totalCost = (distanceInMiles * 10) + DID; // Example: $10 per mile
+
+        //        document.getElementById('Distance').value = distanceInMiles.toFixed(2);
+        //        document.getElementById('TotalCost').value = totalCost.toFixed(2);
+        //        document.getElementById('DID').value = DID.toFixed(2);
+
+        //    }
+        //}
+
+        //// Handle map click to set pickup or dropoff
+        //map.on('click', function (e) {
+        //    if (!pickupMarker) {
+        //        pickupMarker = L.marker(e.latlng, { draggable: true }).addTo(map);
+        //        pickupLatLng = e.latlng;
+        //        updateLocation(pickupMarker, e.latlng, 'PickupLocation');
+
+        //        pickupMarker.on('dragend', function (event) {
+        //            pickupLatLng = event.target.getLatLng();
+        //            updateLocation(pickupMarker, pickupLatLng, 'PickupLocation');
+        //            calculateDistanceAndCost();
+        //        });
+        //    } else if (!dropoffMarker) {
+        //        dropoffMarker = L.marker(e.latlng, { draggable: true }).addTo(map);
+        //        dropoffLatLng = e.latlng;
+        //        updateLocation(dropoffMarker, e.latlng, 'DropoffLocation');
+
+        //        dropoffMarker.on('dragend', function (event) {
+        //            dropoffLatLng = event.target.getLatLng();
+        //            updateLocation(dropoffMarker, dropoffLatLng, 'DropoffLocation');
+        //            calculateDistanceAndCost();
+        //        });
+
+        //        calculateDistanceAndCost();
+        //    }
+        //});
+
+
+    </script>*@
+
+
+
+
+
+@*<script>
+        var map = L.map('map').setView([37.7749, -122.4194], 13); // Default to San Francisco
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        var pickupMarker, dropoffMarker;
+        var pickupLatLng, dropoffLatLng;
+
+        // Function to get address in English
+        function getAddress(lat, lng, callback) {
+            var url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=en`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    callback(data.display_name || "Unknown location");
+                })
+                .catch(() => callback("Unknown location"));
+        }
+
+        // Update the location and address in the input field
+        function updateLocation(marker, latlng, inputId) {
+            marker.setLatLng(latlng);
+            getAddress(latlng.lat, latlng.lng, function (address) {
+                document.getElementById(inputId).value = address;
+            });
+        }
+
+        // Calculate distance and cost
+        function calculateDistanceAndCost() {
+            if (pickupLatLng && dropoffLatLng) {
+                var distanceInMeters = pickupLatLng.distanceTo(dropoffLatLng);
+                var distanceInMiles = distanceInMeters / 1.609; // Convert to miles
+                var DID = (distanceInMiles / 2) * 10;
+
+                var totalCost = (distanceInMiles * 10) + DID; // Example: $10 per mile
+
+                document.getElementById('Distance').value = distanceInMiles.toFixed(2);
+                document.getElementById('TotalCost').value = totalCost.toFixed(2);
+                document.getElementById('DID').value = DID.toFixed(2);
+            }
+        }
+
+        // Handle map click to set pickup or dropoff
+        map.on('click', function (e) {
+            if (!pickupMarker) {
+                pickupMarker = L.marker(e.latlng, { draggable: true }).addTo(map);
+                pickupLatLng = e.latlng;
+                updateLocation(pickupMarker, e.latlng, 'PickupLocation');
+
+                pickupMarker.on('dragend', function (event) {
+                    pickupLatLng = event.target.getLatLng();
+                    updateLocation(pickupMarker, pickupLatLng, 'PickupLocation');
+                    calculateDistanceAndCost();
+                });
+            } else if (!dropoffMarker) {
+                dropoffMarker = L.marker(e.latlng, { draggable: true }).addTo(map);
+                dropoffLatLng = e.latlng;
+                updateLocation(dropoffMarker, e.latlng, 'DropoffLocation');
+
+                dropoffMarker.on('dragend', function (event) {
+                    dropoffLatLng = event.target.getLatLng();
+                    updateLocation(dropoffMarker, dropoffLatLng, 'DropoffLocation');
+                    calculateDistanceAndCost();
+                });
+
+                calculateDistanceAndCost();
+            }
+        });
+
+        // Handle address input fields for pickup and dropoff
+        document.getElementById('PickupLocation').addEventListener('change', function () {
+            var address = this.value;
+            var url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data[0]) {
+                        pickupLatLng = L.latLng(data[0].lat, data[0].lon);
+                        if (pickupMarker) {
+                            updateLocation(pickupMarker, pickupLatLng, 'PickupLocation');
+                        } else {
+                            pickupMarker = L.marker(pickupLatLng, { draggable: true }).addTo(map);
+                            updateLocation(pickupMarker, pickupLatLng, 'PickupLocation');
+                        }
+                        calculateDistanceAndCost();
+                    } else {
+                        alert("Unable to find location.");
+                    }
+                });
+        });
+
+        document.getElementById('DropoffLocation').addEventListener('change', function () {
+            var address = this.value;
+            var url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data[0]) {
+                        dropoffLatLng = L.latLng(data[0].lat, data[0].lon);
+                        if (dropoffMarker) {
+                            updateLocation(dropoffMarker, dropoffLatLng, 'DropoffLocation');
+                        } else {
+                            dropoffMarker = L.marker(dropoffLatLng, { draggable: true }).addTo(map);
+                            updateLocation(dropoffMarker, dropoffLatLng, 'DropoffLocation');
+                        }
+                        calculateDistanceAndCost();
+                    } else {
+                        alert("Unable to find location.");
+                    }
+                });
+        });
+
+    </script>*@

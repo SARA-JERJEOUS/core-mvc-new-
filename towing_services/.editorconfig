@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CS0103: The name '_session' does not exist in the current context
+dotnet_diagnostic.CS0103.severity = error

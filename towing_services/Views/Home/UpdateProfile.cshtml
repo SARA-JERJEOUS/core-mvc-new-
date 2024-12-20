@@ -1,0 +1,249 @@
+﻿@model towing_services.Models.DriverViewModel
+
+<style>
+    body {
+        background: #808080;
+    }
+    /* تنسيق القائمة المنسدلة */
+    .nav-item .dropdown-menu {
+        background-color: #f0f0f0; /* لون الخلفية */
+        border: none;
+        border-radius: 20px; /* زوايا مستديرة */
+        box-shadow: 0px 8px 15px rgb(6 34 57 / 0.10); /* ظل ناعم */
+        padding: 4px;
+        /* إبعاد القائمة عن الحافة اليمنى */
+        margin-left: -50px; /* إضافة مسافة من الحافة اليمنى */
+    }
+
+
+    /* عناصر القائمة المنسدلة */
+    .dropdown-item {
+        font-size: 18px;
+        color: #333;
+        padding: 10px 20px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+        /* تأثير عند المرور على عنصر القائمة المنسدلة */
+        .dropdown-item:hover {
+            background-color: #0b2644; /* لون الخلفية عند المرور */
+            color: #fff; /* لون النص عند المرور */
+            transform: scale(1.05); /* تكبير بسيط */
+        }
+
+    /* تصميم السهم */
+    .nav-link.dropdown-toggle::after {
+        content: ' ▼'; /* إضافة سهم */
+        font-size: 12px;
+        color: inherit; /* نفس لون النص */
+        margin-left: 5px;
+        transition: transform 0.3s ease;
+    }
+
+    /* دوران السهم عند الفتح */
+    .nav-link.dropdown-toggle[aria-expanded="true"]::after {
+        transform: rotate(180deg);
+    }
+
+    /* تأثير الظهور التدريجي للقائمة */
+    .nav-item .dropdown-menu {
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+        /* عند عرض القائمة */
+        .nav-item .dropdown-menu.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+</style>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<h2>Edit Profile</h2>
+@Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+<form asp-action="UpdateProfile" method="post">
+    <input type="hidden" asp-for="@Model.DriverId" />
+
+    <div class="form-group">
+        <label for="Name">Name</label>
+        <input asp-for="@Model.Name" class="form-control" />
+        <span asp-validation-for="@Model.Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Email">Email</label>
+        <input asp-for="@Model.Email" class="form-control" />
+        <span asp-validation-for="@Model.Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="PhoneNumber">Phone Number</label>
+        <input asp-for="@Model.phone" class="form-control" />
+        <span asp-validation-for="@Model.phone" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="VehicleType">Vehicle Type</label>
+        <select asp-for="@Model.VehicleType" class="form-control custom-select" id="VehicleType">
+            <option value="Tow Truck">Tow Truck</option>
+            <option value="Flatbed">Flatbed</option>
+            <option value="Heavy Duty">Heavy Duty</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="CurrentLocation">Current Location</label>
+        <input id="addressInput" class="form-control" placeholder="Enter your address" value="@Model.CurrentLocation" />
+        <span asp-validation-for="@Model.CurrentLocation" class="text-danger"></span>
+    </div>
+
+
+
+    <!-- عرض صورة البروفايل -->
+    <a href="@Url.Content("~/" + @Model.ProfilePicture)" data-toggle="modal" data-target="#imageModal">
+        <img id="profilePic" src="@Url.Content("~/" + @Model.ProfilePicture)" alt="Profile Picture" style="width:50px;height:50px" />
+    </a>
+
+    <!-- عرض صورة الرخصة -->
+    <a href="@Url.Content("~/" + @Model.LicensePicture)" data-toggle="modal" data-target="#imageModal">
+        <img id="licensePic" src="@Url.Content("~/" + @Model.LicensePicture)" alt="License Picture" style="width:50px;height:50px" />
+    </a>
+
+
+
+
+
+
+    <!-- حقول مخفية لتخزين الإحداثيات -->
+    <input asp-for="CurrentLocation" type="hidden" id="CurrentLocation" />
+    <input asp-for="Latitude" type="hidden" id="Latitude" value="@Model.Latitude" />
+    <input asp-for="Longitude" type="hidden" id="Longitude" value="@Model.Longitude" />
+
+    <div id="map" style="height: 400px; width: 100%; margin-top: 10px;"></div>
+
+    <button type="submit" class="btn btn-primary mt-3">Save</button>
+</form>  <!-- مودال لتحديث الصورة -->
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Update Image</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- نموذج رفع الصورة داخل المودال -->
+                <form id="imageUploadForm" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="imageUpload">Select New Image</label>
+                        <input type="file" class="form-control-file" id="imageUpload" name="imageUpload" accept=".jpg,.jpeg,.png" required />
+                    </div>
+
+                    <!-- حقل مخفي لتحديد نوع الصورة (Profile أو License) -->
+                    <input type="hidden" id="imageType" name="imageType" value="profilePicture" />
+
+                    <button type="submit" class="btn btn-primary">Update Image</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+
+
+
+    <script>
+        var map = L.map('map').setView([@Model.Latitude ?? 37.0902, @Model.Longitude ?? -95.7129], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var marker = L.marker([@Model.Latitude ?? 37.0902, @Model.Longitude ?? -95.7129], { draggable: false }).addTo(map);
+
+        // إضافة القدرة على النقر على الخريطة لتحديد الموقع
+        map.on('click', function (e) {
+            var lat = e.latlng.lat;
+            var lng = e.latlng.lng;
+
+            marker.setLatLng([lat, lng]); // تحريك الماركر إلى الموقع الجديد
+
+            // تحديث الإحداثيات في الحقول المخفية
+            document.getElementById('Latitude').value = lat;
+            document.getElementById('Longitude').value = lng;
+
+            // استخدام API لتحويل الإحداثيات إلى عنوان
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=en&addressdetails=1&countrycodes=us`)
+                .then(response => response.json())
+                .then(data => {
+                    var address = data.display_name;
+                    document.getElementById('addressInput').value = address;
+                    document.getElementById('CurrentLocation').value = address;
+                });
+        });
+
+        // تحديث العلامة عند إدخال عنوان
+        document.getElementById('addressInput').addEventListener('change', function () {
+            var address = this.value;
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${address}&accept-language=en&countrycodes=us`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        var lat = data[0].lat;
+                        var lng = data[0].lon;
+                        marker.setLatLng([lat, lng]);
+                        map.setView([lat, lng], 13);
+
+                        document.getElementById('Latitude').value = lat;
+                        document.getElementById('Longitude').value = lng;
+                        document.getElementById('CurrentLocation').value = address;
+                    } else {
+                        alert('Address not found in the United States!');
+                    }
+                });
+        });
+
+
+        $(document).ready(function () {
+            $('#imageUploadForm').submit(function (event) {
+                event.preventDefault(); // منع التحديث التقليدي للصفحة
+
+                var formData = new FormData(this); // الحصول على بيانات النموذج
+
+                $.ajax({
+                    url: '/Driver/UpdateProfile',  // الأكشن الذي سيتم الإرسال إليه
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        if (data.success) {
+                            // تحديث الصورة في الصفحة بناءً على النوع
+                            if (data.imageType === 'profilePicture') {
+                                $('#profilePic').attr('src', data.newImagePath);  // تحديث صورة البروفايل
+                            } else if (data.imageType === 'licensePicture') {
+                                $('#licensePic').attr('src', data.newImagePath);  // تحديث صورة الرخصة
+                            }
+                        } else {
+                            alert('Failed to upload image.');
+                        }
+                    },
+                    error: function () {
+                        alert('An error occurred while uploading the image.');
+                    }
+                });
+            });
+        });
+
+
+    </script>
+}

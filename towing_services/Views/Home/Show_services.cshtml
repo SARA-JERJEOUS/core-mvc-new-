@@ -1,0 +1,818 @@
+﻿@model List<towing_services.Models.Info_services>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+<link href="~/css/site.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<style>
+    body {
+        background-color: #f0f0f0;
+    }
+    /* تنسيق القائمة المنسدلة */
+    .nav-item .dropdown-menu {
+        background-color: #f0f0f0; /* لون الخلفية */
+        border: none;
+        border-radius: 20px; /* زوايا مستديرة */
+        box-shadow: 0px 8px 15px rgb(6 34 57 / 0.10); /* ظل ناعم */
+        padding: 4px;
+        /* إبعاد القائمة عن الحافة اليمنى */
+        margin-left: -50px; /* إضافة مسافة من الحافة اليمنى */
+    }
+
+
+    /* عناصر القائمة المنسدلة */
+    .dropdown-item {
+        font-size: 18px;
+        color: #333;
+        padding: 10px 20px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+        /* تأثير عند المرور على عنصر القائمة المنسدلة */
+        .dropdown-item:hover {
+            background-color: #0b2644; /* لون الخلفية عند المرور */
+            color: #fff; /* لون النص عند المرور */
+            transform: scale(1.05); /* تكبير بسيط */
+        }
+
+    /* تصميم السهم */
+    .nav-link.dropdown-toggle::after {
+        content: ' ▼'; /* إضافة سهم */
+        font-size: 12px;
+        color: inherit; /* نفس لون النص */
+        margin-left: 5px;
+        transition: transform 0.3s ease;
+    }
+
+    /* دوران السهم عند الفتح */
+    .nav-link.dropdown-toggle[aria-expanded="true"]::after {
+        transform: rotate(180deg);
+    }
+
+    /* تأثير الظهور التدريجي للقائمة */
+    .nav-item .dropdown-menu {
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+        /* عند عرض القائمة */
+        .nav-item .dropdown-menu.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    .ho {
+        font-size: 30px;
+        color: #A45848;
+        margin-bottom: 10px;
+    }
+
+    .hh {
+        color: #A45848;
+        margin-top: 10px;
+        font-size: 26px;
+    }
+
+    .card {
+        background: #b2a69a;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        padding: 20px;
+    }
+
+        .card img {
+            width: 80px; /* حجم صغير للأفاتار */
+            height: 80px;
+            border-radius: 50%; /* دائري */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 15px;
+        }
+
+    .btn-dark {
+        background: #8c7a68;
+        border-color: #8c7a68;
+        padding: 12px;
+        font-size: 25px
+    }
+
+        .btn-dark:hover {
+            background-color: #654d35;
+            border-color: #654d35;
+        }
+
+    .page-title {
+        text-align: center;
+        font-size: 48px;
+        font-weight: bold;
+        margin-top: 40px;
+        padding: 20px;
+        color: #A45848;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        /*******************************/
+    }
+
+
+    .wave-background {
+        height: 20vh;
+        background: linear-gradient(46deg, #162252, rgba(52, 74, 99, 0.9) 50%, rgba(74, 105, 139, 0.8));
+        background-size: 200% 100%; /* تحجيم التدرج */
+        animation: waveEffect 3s linear infinite; /* تأثير الحركة */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* تأثير الحركة للموجات */
+    @@keyframes waveEffect {
+        0% {
+            background-position: 30% 0;
+        }
+
+        100% {
+            background-position: 0 0;
+        }
+    }
+    /**********************************************/
+    /* التنسيق الأساسي للنص */
+    .hero-text {
+        font-weight: bold;
+        text-align: center;
+        display: inline-block;
+        word-wrap: break-word; /* يضمن أن النص ينكسر بشكل صحيح داخل الـ div */
+    }
+
+        /* تجزئة الكلمة إلى حروف */
+        .hero-text span {
+            opacity: 0; /* إخفاء الحروف في البداية */
+            display: inline-block;
+            transform: translateY(-30px); /* يبدأ من أعلى */
+            animation: showLetter 1s ease-out forwards;
+        }
+
+        /* تخصيص الحروف */
+        .hero-text span {
+            font-size: 5rem;
+            color: #a5c9e1;
+        }
+
+    /* تخصيص التأثير */
+    @@keyframes showLetter {
+        0% {
+            opacity: 0;
+            transform: translateY(-30px); /* يبدأ الحرف من أعلى */
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0); /* يظهر في مكانه الطبيعي */
+        }
+    }
+
+    /* إضافة تأخير بين الحروف */
+    .hero-text span:nth-child(1) {
+        animation-delay: 0s;
+    }
+
+    .hero-text span:nth-child(2) {
+        animation-delay: 0.3s;
+    }
+
+    .hero-text span:nth-child(3) {
+        animation-delay: 0.6s;
+    }
+
+    .hero-text span:nth-child(4) {
+        animation-delay: 0.9s;
+    }
+
+    .hero-text span:nth-child(5) {
+        animation-delay: 1.2s;
+    }
+
+    .hero-text span:nth-child(6) {
+        animation-delay: 1.5s;
+    }
+
+    .hero-text span:nth-child(7) {
+        animation-delay: 1.8s;
+    }
+
+    .hero-text span:nth-child(8) {
+        animation-delay: 2.1s;
+    }
+
+    .hero-text span:nth-child(9) {
+        animation-delay: 2.4s;
+    }
+
+    .hero-text span:nth-child(10) {
+        animation-delay: 2.7s;
+    }
+
+    .hero-text span:nth-child(11) {
+        animation-delay: 3s;
+    }
+    .hero-text span:nth-child(12) {
+        animation-delay: 3.1s;
+    }
+   
+    /* لإضافة المسافة بين الكلمتين فقط */
+    .space {
+        display: inline-block;
+        width: 18px; /* فراغ بين الكلمتين */
+    }
+
+
+    /* تخصيص أول حرف ليكون أكبر وأزرق داكن */
+    .hero-text span:first-child {
+        font-size: 6rem;
+        color: rgba(0, 0, 0, 0.5); /* أزرق داكن */
+    }
+
+    @@media (max-width: 915px) {
+        /* تخصيص الحروف */
+        .hero-text span {
+            font-size: 2rem;
+            color: #a5c9e1;
+        }
+            /* تخصيص أول حرف ليكون أكبر وأزرق داكن */
+            .hero-text span:first-child {
+                font-size: 4rem;
+                color: rgba(0, 0, 0, 0.5); /* أزرق داكن */
+            }
+    }
+
+    @@media (max-width: 767px) {
+        .hero-text span {
+            font-size: 2rem;
+            color: #a5c9e1;
+        }
+            /* تخصيص أول حرف ليكون أكبر وأزرق داكن */
+            .hero-text span:first-child {
+                font-size: 4rem;
+                color: rgba(0, 0, 0, 0.5); /* أزرق داكن */
+            }
+    }
+
+    @@media (max-width: 576px) {
+        .hero-text span {
+            font-size: 2rem;
+            color: #a5c9e1;
+        }
+            /* تخصيص أول حرف ليكون أكبر وأزرق داكن */
+            .hero-text span:first-child {
+                font-size: 4rem;
+                color: rgba(0, 0, 0, 0.5); /* أزرق داكن */
+            }
+    }
+
+    /***********************************/
+
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+
+    /* Navigation Styling */
+    .side-nav {
+        flex: 0 0 25%; /* Takes 25% of the row width */
+        max-width: 25%;
+        padding: 2rem;
+        margin-left: 2rem; /* Space from the left */
+        margin-top: 1rem; /* Space from the top */
+        border-radius: 8px;
+        
+    }
+
+        .side-nav a {
+            display: block;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            color: black;
+            text-decoration: none;
+            text-align: center;
+        }
+
+
+            .side-nav a:hover {
+                text-decoration: underline;
+            }
+
+    .divider {
+        border-bottom: 2px solid #ddd;
+        margin: 1rem 0;
+    }
+
+    /* Content Styling */
+    .content-section {
+        flex: 1; /* Takes the remaining width */
+        padding: 2rem;
+        margin-left: 1rem;
+        margin-right: 6rem;
+    }
+
+        .content-section h2 {
+            font-size: 2.3rem;
+            margin-bottom: 1rem;
+            color:#316dbf
+        }
+
+
+        .content-section p {
+            font-size: 1.88rem;
+            line-height: 1.5;
+            text-align: justify; /* محاذاة النص */
+            font-family: Arial, sans-serif; /* اختيار نوع الخط */
+        }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .side-nav {
+            flex: 0 0 100%;
+            max-width: 100%;
+            margin-left: 0;
+        }
+
+        .content-section {
+            flex: 0 0 100%;
+            max-width: 100%;
+            margin-left: 0;
+            margin-top: 1rem;
+        }
+
+        .sub-links {
+            display: none; /* Hide the sub-links by default */
+            list-style-type: none;
+            padding-left: 20px;
+        }
+
+        .side-nav a:hover + .sub-links {
+            display: block; /* Show sub-links when hovering over Service 1 */
+        }
+
+        .sub-links li {
+            margin: 5px 0;
+        }
+    }
+
+    .sub-links {
+        list-style-type: none;
+        padding-left: 20px;
+        margin: 0;
+    }
+
+        .sub-links li {
+            margin: 5px 0;
+        }
+
+        .sub-links a {
+            text-decoration: none;
+            color: #007bff;
+            cursor: pointer;
+        }
+
+            .sub-links a:hover {
+                text-decoration: underline;
+            }
+
+    .carousel {
+        overflow: hidden;
+        border-radius: 10px;
+    }
+
+    .carousel-item img {
+        width: 100%;
+        height:350px !important;
+        object-fit: cover;
+        border-radius: 8px; 
+    }
+    .carousel-item img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); 
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+   
+</style>
+
+<div class="container-fluid ">
+
+    <div class="wave-background">
+        <div class="hero-text d-inline-block text-truncate" style="max-width: 930px;">
+            <!-- تجزئة الكلمة إلى حروف باستخدام span مع إضافة الفراغ بين الكلمتين فقط -->
+            <span>O</span>
+            <span>u</span>
+            <span>r</span>
+            <span class="space"></span> <!-- فراغ بين "Our" و "Services" -->
+            <span>S</span>
+            <span>e</span>
+            <span>r</span>
+            <span>v</span>
+            <span>i</span>
+            <span>c</span>
+            <span>e</span>
+            <span>s</span>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Navigation Section -->
+        <nav class="side-nav">
+            <a href="#" id="service1Link">
+                Tow Truck
+            </a>
+            <ul class="sub-links" style="display: none;">
+                <li>
+                    <a href="#" class="sub-link" data-content="sub1">
+                        Heavy Duty Tow Truck
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sub-link" data-content="sub2">
+                        Wheel Lift Tow Truck
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sub-link" data-content="sub3">
+                        Flatbed Tow Truck
+                    </a>
+                </li>
+            </ul>
+            <div class="divider"></div>
+
+            <a href="#" id="service2Link">
+                Jump Start Truck
+            </a>
+            <div class="divider"></div>
+
+            <a href="#" id="service3Link">
+                Boom Truck
+            </a>
+            <div class="divider"></div>
+        </nav>
+
+        <!-- Content Section -->
+        <div class="content-section">
+            <div id="service1" class="service-content">
+                <h2>
+                    Tow Truck
+                </h2>
+                <p>
+                    <span class="sp">
+                        The term tow truck
+                    </span>
+                    encompasses a broad category of specialized vehicles designed to recover and transport disabled, damaged, or illegally parked vehicles. These trucks come in various configurations, including flatbed, wheel-lift, hook-and-chain, and boom tow trucks, each suited to specific towing scenarios.
+
+                    Tow trucks are equipped with robust towing mechanisms, such as winches, hydraulic lifts, or booms, to handle a range of vehicle types. A common use of tow trucks is roadside assistance, where they are deployed to help stranded drivers with vehicles that have broken down. They are also frequently used in accident recovery, parking enforcement, and vehicle impoundment operations.
+
+                    Modern tow trucks often include advanced features such as rear-view cameras, wireless controls, and GPS systems. These technologies enhance the precision and efficiency of towing operations, allowing drivers to recover vehicles safely even in challenging conditions, such as narrow streets or busy highways.
+
+                    One of the most recognizable types of tow trucks is the hook-and-chain tow truck, which uses chains to secure the vehicle. While this design is effective, it is less commonly used today because it can damage the towed vehicle. More contemporary designs, such as wheel-lift tow trucks, use a hydraulic lift to raise the vehicle by its tires, reducing the risk of damage.
+
+                    Tow trucks play an essential role in keeping roads safe and operational. They provide crucial support during emergencies, clear accident scenes, and help enforce parking regulations. Their reliability and adaptability make them an indispensable part of vehicle recovery operations.
+                </p>
+
+                <div id="carouselExampleControls" class="carousel" data-ride="carousel" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); margin-top: 20px;">
+                    <div class="carousel-inner">
+                        Add the carousel indicators (dots)
+                        <ol class="carousel-indicators" style="z-index: 4;">
+                            <li data-target="#carouselExampleControls" data-slide-to="0" class="active"></li>
+                            <li data-target="#carouselExampleControls" data-slide-to="1"></li>
+                            <li data-target="#carouselExampleControls" data-slide-to="2"></li>
+                        </ol>
+                        Carousel item 1
+                        <div class="carousel-item active">
+                            <img class="d-block w-100 size" src="~/services/t1.png" alt="First slide">
+
+                        </div>
+
+                        Carousel item 2
+                        <div class="carousel-item">
+                            <img class="d-block w-100 size" src="~/services/t2.jpg" alt="Second slide">
+
+                        </div>
+                        Carousel item 2
+                        <div class="carousel-item">
+                            <img class="d-block w-100 size" src="~/services/t3.jpg" alt="Second slide">
+
+                        </div>
+
+
+                        Carousel controls
+                        <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sub1" class="service-content" style="display: none;">
+                <h2>
+                    Heavy Duty Tow Truck
+                </h2>
+                <p>
+                    <span class="sp">
+
+                        Heavy-duty tow trucks
+                    </span>
+                        are the workhorses of the towing industry, built to handle the most demanding recovery and transport tasks. Designed specifically for towing large vehicles, these trucks are equipped with powerful engines, reinforced frames, and advanced towing equipment.
+
+                        Heavy-duty tow trucks are commonly used to tow buses, tractor-trailers, construction equipment, and other oversized vehicles. They are essential in commercial vehicle recovery, especially in industries such as logistics, construction, and public transportation. Their towing capacity far exceeds that of standard tow trucks, allowing them to manage vehicles weighing tens of thousands of pounds.
+
+                        A heavy-duty tow truck often features hydraulic systems, winches, and extended booms that provide superior strength and flexibility. These tools enable operators to recover vehicles from difficult situations, such as overturned trucks, vehicles stuck in ditches, or multi-vehicle accidents. The trucks can also lift and tow vehicles directly from the scene of an incident, reducing downtime and ensuring efficient recovery.
+
+                        In addition to their strength, heavy-duty tow trucks are designed for versatility. Many are equipped with rotating booms or specialized underlifts that allow them to tow vehicles from a variety of angles and positions. This makes them suitable for complex recovery operations in confined spaces or uneven terrain.
+
+                        The operators of heavy-duty tow trucks are often highly trained professionals with expertise in handling challenging recovery scenarios. Their skills, combined with the truck's capabilities, make these vehicles indispensable for maintaining traffic flow and public safety in the face of large-scale incidents.
+                </p>
+                <div id="carouselExampleControls1" class="carousel" data-ride="carousel" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); margin-top: 20px;">
+                    <div class="carousel-inner">
+                        Add the carousel indicators (dots)
+                        <ol class="carousel-indicators" style="z-index: 4;">
+                            <li data-target="#carouselExampleControls1" data-slide-to="0" class="active"></li>
+                            <li data-target="#carouselExampleControls1" data-slide-to="1"></li>
+                            <li data-target="#carouselExampleControls1" data-slide-to="2"></li>
+                        </ol>
+                        Carousel item 1
+                        <div class="carousel-item active">
+                            <img class="d-block w-100 size" src="~/services/h1jpg.jpg" alt="First slide">
+
+                        </div>
+
+                        Carousel item 2
+                        <div class="carousel-item">
+                            <img class="d-block w-100 size" src="~/services/h2.jpg" alt="Second slide">
+
+                        </div>
+                        Carousel item 2
+                        <div class="carousel-item">
+                            <img class="d-block w-100 size" src="~/services/h3.jpg" alt="Second slide">
+
+                        </div>
+
+
+                        Carousel controls
+                        <a class="carousel-control-prev" href="#carouselExampleControls1" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselExampleControls1" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sub2" class="service-content" style="display: none;">
+                <h2>
+                    Wheel Lift Tow Truck
+                </h2>
+                <p>
+                    A wheel-lift tow truck is a type of tow vehicle that uses a hydraulic lift to raise a car by its front or rear wheels. This design is an evolution of the older hook-and-chain tow truck, offering a safer and more efficient way to tow vehicles without causing damage.
+
+                    Wheel-lift tow trucks are commonly used for short-distance towing, such as relocating parked vehicles, recovering inoperable cars, or providing roadside assistance. They are especially effective for smaller vehicles, such as sedans or compact SUVs.
+
+                    The main feature of a wheel-lift tow truck is its lifting mechanism, which consists of a metal yoke that slides under the vehicle's tires. Once secured, the hydraulic system lifts the vehicle's front or rear wheels off the ground, while the other set of wheels remains in contact with the road. This method is quick and minimizes potential damage, making it ideal for urban areas or tight spaces.
+
+                    Wheel-lift tow trucks are often favored for their maneuverability and cost-effectiveness. Unlike flatbed tow trucks, they do not require a large amount of space for loading and unloading. This makes them an excellent choice for towing vehicles from crowded parking lots or narrow streets.
+
+                    In addition to their primary function, wheel-lift tow trucks can be equipped with additional features, such as winches or dollies, to handle specific recovery needs. Their compact size and efficient operation make them a staple in towing fleets worldwide.
+                </p>
+                <div id="carouselExampleControls2" class="carousel" data-ride="carousel" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); margin-top: 20px;">
+                    <div class="carousel-inner">
+                        Add the carousel indicators (dots)
+                        <ol class="carousel-indicators" style="z-index: 4;">
+                            <li data-target="#carouselExampleControls2" data-slide-to="0" class="active"></li>
+                            <li data-target="#carouselExampleControls2" data-slide-to="1"></li>
+                            <li data-target="#carouselExampleControls2" data-slide-to="2"></li>
+                        </ol>
+                        Carousel item 1
+                        <div class="carousel-item active">
+                            <img class="d-block w-100 size" src="~/services/w3.jpg" alt="Second slide">
+
+                        </div>
+
+                        Carousel item 2
+                        <div class="carousel-item">
+                            <img class="d-block w-100 size" src="~/services/w1.jpg" alt="First slide">
+
+                        </div>
+                        Carousel item 2
+                        <div class="carousel-item">
+                            <img class="d-block w-100 size" src="~/services/w2.jpg" alt="Second slide">
+
+                        </div>
+
+
+                        Carousel controls
+                        <a class="carousel-control-prev" href="#carouselExampleControls2" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselExampleControls2" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sub3" class="service-content" style="display: none;">
+                <h2>
+                    Flatbed Tow Truck
+                </h2>
+                <p>
+                    A flatbed tow truck, also referred to as a rollback tow truck, is one of the most versatile and commonly used towing vehicles. Its defining feature is its flat, horizontal bed, which forms the entire back of the truck. This flat surface is mounted on a hydraulic system that allows it to tilt and create a ramp for loading vehicles. The design makes it possible to transport a wide range of vehicles safely and efficiently.
+
+                    Flatbed tow trucks are particularly beneficial for transporting vehicles that are non-operational, severely damaged, or require extra care, such as luxury cars, antique vehicles, or sports cars. The tilting mechanism allows vehicles to be either driven onto the bed or winched up if they cannot move under their own power. This feature minimizes the risk of further damage during the towing process, as the entire vehicle rests securely on the flatbed, rather than being dragged or suspended by its wheels.
+
+                    These trucks are also commonly used in long-distance vehicle transportation. Since the vehicle is completely off the ground, it avoids wear and tear that might occur during a wheel-lift tow. Flatbed tow trucks are highly valued in scenarios where maintaining the condition of the vehicle is a priority, such as when transporting new cars to dealerships or high-value cars to events.
+
+                    The versatility of flatbed tow trucks extends beyond vehicle towing. They can be used to transport heavy equipment, motorcycles, small boats, or even materials for construction. The flat, open design allows for easy loading and unloading, making them suitable for a variety of industries.
+
+                    The design and functionality of flatbed tow trucks prioritize safety. Vehicles secured on the bed are held in place using chains or straps, preventing movement during transport. This makes them an ideal choice for navigating rough terrain or highways at higher speeds.
+                </p>
+                <div id="carouselExampleControls3" class="carousel" data-ride="carousel" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); margin-top: 20px;">
+                    <div class="carousel-inner">
+                        Add the carousel indicators (dots)
+                        <ol class="carousel-indicators" style="z-index: 4;">
+                            <li data-target="#carouselExampleControls3" data-slide-to="0" class="active"></li>
+                            <li data-target="#carouselExampleControls3" data-slide-to="1"></li>
+                            <li data-target="#carouselExampleControls3" data-slide-to="2"></li>
+                        </ol>
+                        Carousel item 1
+                        <div class="carousel-item active">
+                            <img class="d-block w-100 size" src="~/services/f1.jpg" alt="Second slide">
+
+                        </div>
+
+                        Carousel item 2
+                        <div class="carousel-item">
+                            <img class="d-block w-100 size" src="~/services/f2.jpg" alt="First slide">
+
+                        </div>
+                        Carousel item 2
+                        <div class="carousel-item">
+                            <img class="d-block w-100 size" src="~/services/f4.jpg" alt="Second slide">
+
+                        </div>
+
+
+                        Carousel controls
+                        <a class="carousel-control-prev" href="#carouselExampleControls3" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselExampleControls3" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="service2" class="service-content" style="display: none;">
+                <h2>
+                    Jump Start Truck
+                </h2>
+                <p>
+                    A Jump Start Truck is a vital tool for roadside assistance services, designed specifically to help vehicles with dead or malfunctioning batteries. Unlike traditional jump-starting methods that use a smaller portable battery pack or cables connected to another vehicle, these trucks are equipped with heavy-duty systems capable of delivering high power. They often feature industrial-grade battery packs or onboard generators, ensuring they can start any vehicle regardless of size or battery condition.
+
+                    One of the standout features of a Jump Start Truck is its versatility. It can handle various vehicles, from small passenger cars to large commercial trucks, buses, and even construction equipment. This versatility is critical for businesses with large fleets or for roadside assistance providers who encounter a wide range of vehicles daily.
+
+                    In addition to its powerful battery systems, a Jump Start Truck is typically outfitted with durable jumper cables or advanced clamp systems. These cables are long and flexible, allowing technicians to reach awkwardly positioned vehicles, such as those parked in tight spots or stranded in ditches. Some models also include wireless diagnostic tools that can assess the health of the vehicle’s battery and electrical system before attempting a jump-start.
+
+                    These trucks are particularly useful in extreme weather conditions, such as freezing winters or scorching summers, where batteries often fail due to temperature fluctuations. The built-in generator can also provide auxiliary power to other electrical components, such as lights, heaters, or small tools, making these trucks even more versatile in emergencies.
+
+                    From a business perspective, owning or operating a Jump Start Truck is a cost-effective solution for fleet operators. It minimizes vehicle downtime, which is essential for industries reliant on timely deliveries or services. Roadside assistance companies also benefit from the efficiency and reliability these trucks offer, enhancing their reputation for prompt and effective service.
+
+                    However, it’s essential to note that operating a Jump Start Truck requires proper training. The high voltage and amperage involved can be hazardous if not handled correctly. Safety protocols, such as wearing insulated gloves and ensuring proper cable connections, are critical to preventing accidents.
+
+                    In conclusion, a Jump Start Truck is more than just a vehicle; it’s a mobile powerhouse designed to keep other vehicles running. Whether it’s assisting stranded drivers on the roadside or ensuring fleet vehicles stay operational, this truck plays an indispensable role in modern transportation services.
+
+                </p>
+            </div>
+
+            <div id="service3" class="service-content" style="display: none;">
+                <h2>Boom Truck</h2>
+                <p>
+                    A Boom Truck, often referred to as a crane truck, is a versatile piece of equipment designed for lifting and moving heavy loads. The defining feature of this truck is its hydraulic boom, a crane-like arm capable of extending, lifting, and positioning objects with precision. This functionality makes it indispensable in construction, utility work, and vehicle recovery operations.
+
+                    The hydraulic boom on these trucks is a marvel of engineering. It can extend to significant lengths, often reaching heights of 30 to 100 feet, depending on the model. This reach allows operators to lift and place materials in hard-to-access areas, such as the upper floors of buildings under construction or behind obstacles like fences and walls. Additionally, the boom can rotate 360 degrees, providing flexibility in maneuvering loads.
+
+                    Boom Trucks are equipped with stabilizing outriggers, which extend from the truck’s sides to ensure stability during operation. These outriggers distribute the truck’s weight evenly, preventing tipping even when handling heavy loads. The combination of the boom and outriggers allows these trucks to perform tasks that would typically require stationary cranes, but with the added benefit of mobility.
+
+                    In construction, Boom Trucks are commonly used to lift materials like steel beams, pipes, or precast concrete sections. Utility companies rely on them for tasks like installing power lines, repairing streetlights, or maintaining traffic signals. In the towing and recovery industry, Boom Trucks are used to retrieve vehicles from challenging situations, such as cars stuck in ditches or off-road areas.
+
+                    Safety is a top priority when operating a Boom Truck. Operators must undergo specialized training to handle the hydraulic system, understand weight limits, and follow safety protocols. Overloading the boom or failing to stabilize the truck properly can lead to accidents, including tipping or equipment failure.
+
+                    Despite their complexity, Boom Trucks are relatively compact compared to stationary cranes, making them suitable for urban environments where space is limited. Their mobility allows them to move between job sites quickly, reducing downtime and increasing productivity.
+
+                    In conclusion, the Boom Truck is a versatile and powerful tool that bridges the gap between traditional cranes and standard service vehicles. Its ability to lift, move, and position heavy loads with precision makes it an invaluable asset across multiple industries.
+
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@*<div class="container">
+        <h1 class="page-title">Towing Services</h1>
+
+
+
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-12 col-12" data-aos="fade-up">
+                    <div class="card h-100">
+                        <img src="~/logo/LOGO.jpeg" class="card-img-top rounded-circle mx-auto d-block" alt="Service Logo">
+                        <div class="card-body">
+                            <h5 class="card-title ho" data-bs-toggle="collapse" href="#collapse_@item.ServiceId" role="button" aria-expanded="false" aria-controls="collapse_@item.ServiceId">
+                                @item.Name
+                            </h5>
+                            <p class="card-text hh collapse" id="collapse_@item.ServiceId">
+                                @item.Description <br> <strong>@item.BasePrice $</strong>
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <a type="button" asp-controller="Home" asp-action="Order_Req" class="btn btn-dark">Service request</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div style="padding:40px">
+
+    </div>*@
+<script>
+    AOS.init({
+        duration: 1000, // مدة الحركة بالميلي ثانية
+        offset: 100,    // المسافة قبل تفعيل الحركة
+        once: true      // الحركة تظهر مرة واحدة فقط
+    });
+
+    // Function to toggle sub-links visibility
+        document.getElementById('service1Link').addEventListener('click', function (event) {
+            event.preventDefault();
+        const subLinks = document.querySelector('.sub-links');
+        const isHidden = subLinks.style.display === 'none';
+        subLinks.style.display = isHidden ? 'block' : 'none';
+    });
+
+        // Function to show content based on clicked link
+        function showService(contentId) {
+        // Hide all content sections
+        const sections = document.querySelectorAll('.service-content');
+        sections.forEach(section => section.style.display = 'none');
+
+        // Show the selected content
+        const selectedSection = document.getElementById(contentId);
+        if (selectedSection) {
+            selectedSection.style.display = 'block';
+        }
+    }
+
+    // Add event listeners to sub-links
+    document.querySelectorAll('.sub-link').forEach(link => {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+                const contentId = this.getAttribute('data-content');
+                showService(contentId);
+            });
+    });
+    // Add event listeners for main links
+    document.getElementById('service1Link').addEventListener('click', function (event) {
+        event.preventDefault();
+        showService('service1');
+    });
+        // Add event listeners for main links
+        document.getElementById('service2Link').addEventListener('click', function (event) {
+            event.preventDefault();
+        showService('service2');
+    });
+
+        document.getElementById('service3Link').addEventListener('click', function (event) {
+            event.preventDefault();
+        showService('service3');
+    });
+</script>
+

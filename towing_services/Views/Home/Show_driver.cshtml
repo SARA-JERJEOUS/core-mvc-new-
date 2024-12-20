@@ -1,0 +1,142 @@
+﻿@model IEnumerable<Dal.Driver>
+
+<style>
+    body {
+        background: #EADED2;
+    }
+    /* تنسيق القائمة المنسدلة */
+    .nav-item .dropdown-menu {
+        background-color: #f0f0f0; /* لون الخلفية */
+        border: none;
+        border-radius: 20px; /* زوايا مستديرة */
+        box-shadow: 0px 8px 15px rgb(6 34 57 / 0.10); /* ظل ناعم */
+        padding: 4px;
+        /* إبعاد القائمة عن الحافة اليمنى */
+        margin-left: -50px; /* إضافة مسافة من الحافة اليمنى */
+    }
+
+
+    /* عناصر القائمة المنسدلة */
+    .dropdown-item {
+        font-size: 18px;
+        color: #333;
+        padding: 10px 20px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+        /* تأثير عند المرور على عنصر القائمة المنسدلة */
+        .dropdown-item:hover {
+            background-color: #0b2644; /* لون الخلفية عند المرور */
+            color: #fff; /* لون النص عند المرور */
+            transform: scale(1.05); /* تكبير بسيط */
+        }
+
+    /* تصميم السهم */
+    .nav-link.dropdown-toggle::after {
+        content: ' ▼'; /* إضافة سهم */
+        font-size: 12px;
+        color: inherit; /* نفس لون النص */
+        margin-left: 5px;
+        transition: transform 0.3s ease;
+    }
+
+    /* دوران السهم عند الفتح */
+    .nav-link.dropdown-toggle[aria-expanded="true"]::after {
+        transform: rotate(180deg);
+    }
+
+    /* تأثير الظهور التدريجي للقائمة */
+    .nav-item .dropdown-menu {
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+        /* عند عرض القائمة */
+        .nav-item .dropdown-menu.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    .table th, .table td, span, h2 {
+        font-size: 20px;
+        color: #A45848;
+        font-weight:bold
+    }
+
+    .btn {
+        font-size: 20px;
+        background: #1c1445;
+        color:white
+
+    }
+        .btn:hover {
+            background: #808080;
+        }
+
+    .f {
+        font-size: 20px;
+    }
+    .bg{
+        background:#3243ff;
+
+    }
+    .bg-n {
+        background: #5b578f;
+        padding:7px 17px
+        
+    }
+</style>
+
+<div style="padding:20px"></div>
+<h2 class="my-4 text-center">Manage Drivers</h2>
+<div style="padding:8px"></div>
+
+<table class="table  table-hover">
+    <thead class="table-sm">
+        <tr>
+            <th class="f">Name</th>
+            <th class="f">VehicleType</th>
+            <th class="f">Email</th>
+            <th class="f">Phone</th>
+            <th class="f">Status</th>
+            <th class="f">Actions</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var driver in Model)
+        {
+        <tr class="@((driver.IsNewDriver) ? "" : "")">
+            <!-- تمييز السائقين الجدد باللون الرمادي -->
+            <td>@driver.UserName</td>
+            <td>@driver.VehicleType</td>
+
+            <td>@driver.Email</td>
+            <td>@driver.PhoneNumber</td>
+
+            <td>
+                @if (driver.IsApproved)
+                {
+                    <span class="badge bg fs-6">Approved</span>
+                }
+                else
+                {
+                    <span class="badge bg-n fs-6">Pending</span>
+                }
+            </td>
+            <td>
+                @if (!driver.IsApproved)
+                {
+                    <a href="@Url.Action("ApproveDriver", "Home", new { id = driver.Id })" class="btn  btn-sm">Approve</a>
+                    <a href="@Url.Action("RejectDriver", "Home", new { id = driver.Id })" class="btn  btn-sm">Reject</a>
+                }
+                else
+                {
+                    <span class="text-muted">No actions</span>
+                }
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

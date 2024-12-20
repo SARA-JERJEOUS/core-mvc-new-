@@ -1,0 +1,738 @@
+﻿@model towing_services.Models.RegisterDriverViewModel
+
+
+
+
+<style>
+    /* تحسين الخلفية بشكل جذاب */
+    body {
+        background: #f0f0f0;
+    }
+    /* تنسيق القائمة المنسدلة */
+    .nav-item .dropdown-menu {
+        background-color: #f0f0f0; /* لون الخلفية */
+        border: none;
+        border-radius: 20px; /* زوايا مستديرة */
+        box-shadow: 0px 8px 15px rgb(6 34 57 / 0.10); /* ظل ناعم */
+        padding: 4px;
+        /* إبعاد القائمة عن الحافة اليمنى */
+        margin-left: -50px; /* إضافة مسافة من الحافة اليمنى */
+    }
+
+
+    /* عناصر القائمة المنسدلة */
+    .dropdown-item {
+        font-size: 18px;
+        color: #333;
+        padding: 10px 20px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+        /* تأثير عند المرور على عنصر القائمة المنسدلة */
+        .dropdown-item:hover {
+            background-color: #0b2644; /* لون الخلفية عند المرور */
+            color: #fff; /* لون النص عند المرور */
+            transform: scale(1.05); /* تكبير بسيط */
+        }
+
+    /* تصميم السهم */
+    .nav-link.dropdown-toggle::after {
+        content: ' ▼'; /* إضافة سهم */
+        font-size: 12px;
+        color: inherit; /* نفس لون النص */
+        margin-left: 5px;
+        transition: transform 0.3s ease;
+    }
+
+    /* دوران السهم عند الفتح */
+    .nav-link.dropdown-toggle[aria-expanded="true"]::after {
+        transform: rotate(180deg);
+    }
+
+    /* تأثير الظهور التدريجي للقائمة */
+    .nav-item .dropdown-menu {
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+        /* عند عرض القائمة */
+        .nav-item .dropdown-menu.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    .form-group label {
+        color: black;
+        font-weight: bold;
+        font-size: 25px;
+    }
+
+    .text-danger,.sp {
+        color: blue;
+        font-size: 23px;
+    }
+
+    
+
+    .form-control {
+        font-size: 28px;
+        background-color: transparent;
+        border: none;
+        border-bottom: 3px solid #007bff;
+        border-radius: 0;
+    }
+
+        .form-control:focus {
+            border-bottom: 3px solid #033E3E;
+            box-shadow: none;
+            background-color: transparent;
+        }
+
+
+    option:hover {
+        color: #1c1445 !important
+    }
+
+    /* تخصيص المظهر لـ optgroup */
+    optgroup {
+        font-weight: bold;
+        color: #3b5bdb; /* يمكنك تغيير اللون هنا */
+        font-size: 1.30rem;
+    }
+
+        /* تخصيص الأسهم عند المرور على الـ optgroup */
+        optgroup[label="Tow Truck Favourites"]:hover {
+            color: #fff;
+            background-color: #3b5bdb;
+        }
+    /***********************/
+    .card {
+        background: linear-gradient(135deg, #f4f4f4, #ffffff);
+        border-radius: 10px;
+        box-shadow: 4px 4px 10px #3b5bdb, -4px -4px 10px #033E3E;
+    }
+
+    .animate-card {
+        transform: translateY(30px);
+        opacity: 0;
+        transition: all 0.8s ease-in-out;
+    }
+
+        .animate-card.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    .btn {
+        position: relative;
+        padding: 0.70em 1.5em;
+        background-color: #38ACEC;
+        border: 4px solid #fff; /* تحديد حدود الزر بلون أبيض */
+        color: black;
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 5px;
+        overflow: hidden;
+        transition: color 0.3s, border-color 0.3s;
+        z-index: 1; /* تأكد أن التأثير يأتي خلف النص */
+    }
+
+        /* تأثير عند المرور بالماوس على الزر */
+        .btn::before {
+            content: ''; /* محتوى خالي فقط لإنشاء عنصر إضافي */
+            position: absolute;
+            top: 0;
+            left: -100%; /* وضع العنصر خارج الزر من اليسار */
+            width: 100%;
+            height: 100%;
+            background-color: #15317E; /* لون الخلفية الجديد */
+            transition: left 0.5s ease; /* حركة من اليسار إلى اليمين */
+            z-index: -1; /* تأكد أن التأثير يأتي خلف النص */
+        }
+
+        /* عند المرور بالماوس على الزر */
+        .btn:hover {
+            color: black;
+            border-color: #3b5bdb; /* تغيير لون الحدود عند المرور */
+        }
+
+            /* عند مرور الماوس على الزر وتحرك التأثير */
+            .btn:hover::before {
+                left: 0; /* يجعل الخلفية تتحرك من اليسار إلى اليمين */
+            }
+
+        /* التأثير على النص */
+        .btn:hover {
+            color: #ddd;
+        }
+
+    /****************************************/
+    .wave-background {
+        height: 5vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hero-text span:first-child {
+        color: #033E3E; /* لون الحرف الأول */
+    }
+
+    .hero-text span:nth-child(10) {
+        color: #033E3E; /* لون الحرف الأول */
+    }
+    .hero-text span:nth-child(13) {
+        color: #033E3E; /* لون الحرف الأول */
+    }
+
+
+    @@keyframes waveEffect {
+        0% {
+            background-position: 20% 0;
+        }
+
+        100% {
+            background-position: 0 0;
+        }
+    }
+
+    @@keyframes colorShift {
+        0% {
+            background: linear-gradient(46deg, #162252, #368BC1 50%, #3090C7);
+        }
+
+        100% {
+            background: linear-gradient(46deg, #3090C7, #368BC1 50%, #162252);
+        }
+    }
+    .container {
+        padding: 10px 0px
+    }
+
+    /* التنسيق الأساسي للنص */
+    .hero-text {
+        font-weight: bold;
+        text-align: center;
+        display: inline-block;
+        word-wrap: break-word; /* يضمن أن النص ينكسر بشكل صحيح داخل الـ div */
+    }
+
+        /* تجزئة الكلمة إلى حروف */
+        .hero-text span {
+            opacity: 0; /* إخفاء الحروف في البداية */
+            display: inline-block;
+            transform: translateY(-30px); /* يبدأ من أعلى */
+            animation: showLetter 1s ease-out forwards;
+            font-size: 4rem;
+            color: #a5c9e1;
+        }
+
+            /* إضافة تأخير بين الحروف */
+            .hero-text span:nth-child(1) {
+                animation-delay: 0s;
+            }
+
+            .hero-text span:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .hero-text span:nth-child(3) {
+                animation-delay: 0.4s;
+            }
+
+            .hero-text span:nth-child(4) {
+                animation-delay: 0.6s;
+            }
+
+            .hero-text span:nth-child(5) {
+                animation-delay: 0.8s;
+            }
+
+            .hero-text span:nth-child(6) {
+                animation-delay: 1s;
+            }
+
+            .hero-text span:nth-child(7) {
+                animation-delay: 1.2s;
+            }
+
+            .hero-text span:nth-child(8) {
+                animation-delay: 1.4s;
+            }
+
+            .hero-text span:nth-child(9) {
+                animation-delay: 1.6s;
+            }
+
+            .hero-text span:nth-child(10) {
+                animation-delay: 1.8s;
+            }
+
+            .hero-text span:nth-child(11) {
+                animation-delay: 2s;
+            }
+
+            .hero-text span:nth-child(12) {
+                animation-delay: 2.2s;
+            }
+
+            .hero-text span:nth-child(13) {
+                animation-delay: 2.4s;
+
+            }
+
+            .hero-text span:nth-child(14) {
+                animation-delay: 2.6s;
+            }
+
+            .hero-text span:nth-child(15) {
+                animation-delay: 2.8s;
+            }
+
+            .hero-text span:nth-child(16) {
+                animation-delay: 3s;
+            }
+            .hero-text span:nth-child(17) {
+                animation-delay: 3.1s;
+            }
+            .hero-text span:nth-child(18) {
+                animation-delay: 3.2s;
+            }
+
+    /* الفراغ بين الكلمتين */
+    .space {
+        display: inline-block;
+        width: 18px; /* تعديل عرض الفراغ */
+    }
+
+    /* تأثير الأنيميشن للحروف */
+    @@keyframes showLetter {
+        0% {
+            opacity: 0;
+            transform: translateY(-30px); /* يبدأ من أعلى */
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0); /* يظهر في مكانه الطبيعي */
+        }
+    }
+  
+    @@media (max-width: 915px) {
+        .hero-text span {
+            font-size: 2rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .hero-text span {
+            font-size: 1.48rem;
+        }
+
+    }
+    @@media (max-width: 768px) {
+        .form-group label {
+            color: black;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .form-group span {
+            color: red;
+            font-size: 18px;
+        }
+
+        .form-control {
+            font-size: 19.5px;
+        }
+    }
+    /********************************/
+    /* تصغير عرض حقل مفتاح الدولة */
+    .area-code-select {
+        flex: 0 0 20%; /* عرض حقل مفتاح الدولة */
+        max-width: 20%;
+        text-align: center;
+        background-color: #f8f9fa;
+    }
+    .FF{
+        font-size:24px;
+        font-weight:bold;
+        color:black
+    }
+
+
+</style>
+<div style="padding:30px">
+  
+
+</div>
+<div class="container">
+    <div class="wave-background">
+        <div class="hero-text d-inline-block " style="max-width: 930px; margin-bottom:50px">
+            <span>R</span>
+            <span>e</span>
+            <span>g</span>
+            <span>i</span>
+            <span>s</span>
+            <span>t</span>
+            <span>e</span>
+            <span>r</span>
+            <span class="space"></span>
+            <span>a</span>
+            <span>s</span>
+            <span class="space"></span>
+            <span>D</span>
+            <span>r</span>
+            <span>i</span>
+            <span>v</span>
+            <span>e</span>
+            <span>r</span>
+        </div>
+    </div>
+</div>
+
+<div class="container ">
+
+
+    <div class="d-flex justify-content-center align-items-center ">
+
+        <div class="card  p-4 animate-card" style="width: 100%; max-width: 700px;">
+            <form asp-action="Register" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="Name">Name</label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="Phone">Phone</label>
+                    <div class="input-group">
+                        <!-- اختيار مفتاح الولاية -->
+                        <select id="areaCode" class="form-control" required>
+                            <option value="+1 (205) ">+1 205 (Alabama)</option>
+                            <option value="+1 (907) ">+1 907 (Alaska)</option>
+                            <option value="+1 (480) ">+1 480 (Arizona)</option>
+                            <option value="+1 (501) ">+1 501 (Arkansas)</option>
+                            <option value="+1 (310) ">+1 310 (California)</option>
+                            <option value="+1 (303) ">+1 303 (Colorado)</option>
+                            <option value="+1 (203) ">+1 203 (Connecticut)</option>
+                            <option value="+1 (302) ">+1 302 (Delaware)</option>
+                            <option value="+1 (305) ">+1 305 (Florida)</option>
+                            <option value="+1 (470) ">+1 470 (Georgia)</option>
+                            <option value="+1 (808) ">+1 808 (Hawaii)</option>
+                            <option value="+1 (208) ">+1 208 (Idaho)</option>
+                            <option value="+1 (312) ">+1 312 (Illinois)</option>
+                            <option value="+1 (317) ">+1 317 (Indiana)</option>
+                            <option value="+1 (515) ">+1 515 (Iowa)</option>
+                            <option value="+1 (913) ">+1 913 (Kansas)</option>
+                            <option value="+1 (502) ">+1 502 (Kentucky)</option>
+                            <option value="+1 (225) ">+1 225 (Louisiana)</option>
+                            <option value="+1 (207) ">+1 207 (Maine)</option>
+                            <option value="+1 (301) ">+1 301 (Maryland)</option>
+                            <option value="+1 (617) ">+1 617 (Massachusetts)</option>
+                            <option value="+1 (231) ">+1 231 (Michigan)</option>
+                            <option value="+1 (612) ">+1 612 (Minnesota)</option>
+                            <option value="+1 (662) ">+1 662 (Mississippi)</option>
+                            <option value="+1 (314) ">+1 314 (Missouri)</option>
+                            <option value="+1 (406) ">+1 406 (Montana)</option>
+                            <option value="+1 (231) ">+1 231 (Nebraska)</option>
+                            <option value="+1 (702) ">+1 702 (Nevada)</option>
+                            <option value="+1 (603) ">+1 603 (New Hampshire)</option>
+                            <option value="+1 (973) ">+1 973 (New Jersey)</option>
+                            <option value="+1 (505) ">+1 505 (New Mexico)</option>
+                            <option value="+1 (212) ">+1 212 (New York)</option>
+                            <option value="+1 (252) ">+1 252 (North Carolina)</option>
+                            <option value="+1 (701) ">+1 701 (North Dakota)</option>
+                            <option value="+1 (216) ">+1 216 (Ohio)</option>
+                            <option value="+1 (405) ">+1 405 (Oklahoma)</option>
+                            <option value="+1 (503) ">+1 503 (Oregon)</option>
+                            <option value="+1 (215) ">+1 215 (Pennsylvania)</option>
+                            <option value="+1 (401) ">+1 401 (Rhode Island)</option>
+                            <option value="+1 (615) ">+1 615 (Tennessee)</option>
+                            <option value="+1 (512) ">+1 512 (Texas)</option>
+                            <option value="+1 (801) ">+1 801 (Utah)</option>
+                            <option value="+1 (802) ">+1 802 (Vermont)</option>
+                            <option value="+1 (703) " selected>+1 703 (Virginia)</option>
+                            <option value="+1 (206) ">+1 206 (Washington)</option>
+                            <option value="+1 (304) ">+1 304 (West Virginia)</option>
+                            <option value="+1 (414) ">+1 414 (Wisconsin)</option>
+                            <option value="+1 (307) ">+1 307 (Wyoming)</option>
+
+                        </select>
+                        <input type="text" id="phoneNumber" name="Phone" class="form-control" placeholder="Enter your phone number" required />
+                    </div>
+                    <span id="phoneError" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="Email">Email</label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="VehicleType" class="control-label">Vehicle Type</label>
+                    <select asp-for="VehicleType" class="form-control custom-select" id="VehicleType">
+                        <option value="Tow Truck">Tow Truck</option>
+
+                        <!-- قائمة فرعية تحتوي على فئات Tow Truck -->
+                        <optgroup label="Tow Truck Favourites">
+                            <option value="Flatbed">Flatbed</option>
+                            <option value="Heavy Duty">Heavy Duty</option>
+                            <option value="Wheel Lift">Wheel Lift</option>
+                        </optgroup>
+                        <!-- خيارات أخرى يمكن اختيارها -->
+                        <option value="Other Vehicle">
+                            Jump Start Truck
+                        </option>
+
+                        <option value="Other Vehicle">
+                            Boom Truck
+                        </option>
+                    </select>
+                </div>
+
+
+
+                <div class="mb-3">
+                    <label asp-for="ProfilePicture" class="form-label  FF">Profile Picture <span class="text-danger">*</span></label>
+                    <input asp-for="ProfilePicture" type="file" class="form-control" accept=".jpg,.jpeg,.png" />
+                    <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="LicensePicture" class="form-label FF">License Picture <span class="text-danger">*</span></label>
+                    <input asp-for="LicensePicture" type="file" class="form-control" accept=".jpg,.jpeg,.png" />
+                    <span asp-validation-for="LicensePicture" class="text-danger"></span>
+                </div>
+
+
+
+                <div class="form-group">
+                    <label for="Password">Password</label>
+                    <div class="input-group">
+                        <input asp-for="Password" type="password" class="form-control" id="Password" />
+                        <div class="input-group-append">
+                            <span class="input-group-text" onclick="togglePasswordsVisibility()" style="cursor: pointer;">
+                                <i class="fas fa-eye" id="toggleIcon"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                    <span class="sp">Password must be at least 8 characters long and contain numbers, letters, and symbols.</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="ConfirmPassword">Repeat Your Password</label>
+                    <div class="input-group">
+                        <input asp-for="ConfirmPassword" type="password" class="form-control" id="ConfirmPassword" />
+                        <div class="input-group-append">
+                            <span class="input-group-text" onclick="togglePasswordsVisibility()" style="cursor: pointer;">
+                                <i class="fas fa-eye" id="toggleIcon"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+            
+                @Html.AntiForgeryToken()
+
+
+                <div class="form-group text-center mt-3">
+
+                    <!-- الزر في HTML -->
+                    <button type="submit" class="btn ">Register</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div style="padding:30px">
+
+</div>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+
+
+        function togglePasswordsVisibility() {
+            // الحقول المستهدفة
+            const passwordField = document.getElementById("Password");
+            const confirmPasswordField = document.getElementById("ConfirmPassword");
+            const icon = document.querySelector("#toggleIcon");
+
+            // تبديل نوع الحقول
+            const isPassword = passwordField.type === "password";
+
+            passwordField.type = isPassword ? "text" : "password";
+            confirmPasswordField.type = isPassword ? "text" : "password";
+
+            // تبديل الأيقونة
+            icon.classList.toggle("fa-eye");
+            icon.classList.toggle("fa-eye-slash");
+        }
+        /************************/
+        document.addEventListener("DOMContentLoaded", function () {
+            const card = document.querySelector(".animate-card");
+            setTimeout(() => {
+                card.classList.add("active");
+            }, 100); // تأخير بسيط لإظهار الحركة
+        });
+
+        /******************/
+        const areaCode = document.getElementById("areaCode");
+        const phoneNumber = document.getElementById("phoneNumber");
+
+        // عند تغيير مفتاح الدولة، يتم تعيين الحقل إلى مفتاح الدولة فقط
+        areaCode.addEventListener("change", function () {
+            phoneNumber.value = areaCode.value; // تعيين الحقل بمفتاح الدولة الجديد
+        });
+
+        // تحديث الرقم عند الكتابة
+        phoneNumber.addEventListener("input", function () {
+            let currentValue = phoneNumber.value;
+
+            // إذا كانت القيمة فارغة، إعادة مفتاح الدولة فقط
+            if (currentValue.trim() === '') {
+                phoneNumber.value = areaCode.value;
+                return;
+            }
+
+            // إزالة أي تكرارات لمفتاح الدولة داخل النص
+            let sanitizedValue = currentValue.replace(new RegExp(`^(${areaCode.value})+`), areaCode.value);
+
+            // تحديث الحقل بالقيمة المعالجة
+            phoneNumber.value = sanitizedValue;
+        });
+
+        // التأكد من وجود مفتاح الدولة عند فقدان التركيز
+        phoneNumber.addEventListener("focusout", function () {
+            if (phoneNumber.value.trim() === '' || phoneNumber.value === areaCode.value) {
+                phoneNumber.value = areaCode.value; // إعادة مفتاح الدولة فقط إذا كان الحقل فارغًا
+            }
+        });
+
+        // تحديث حقل مفتاح الدولة ليعرض المفتاح فقط عند تغييره
+        areaCode.addEventListener("change", function () {
+            const selectedOption = areaCode.options[areaCode.selectedIndex];
+            areaCode.value = selectedOption.value; // عرض المفتاح فقط
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            const areaCode = document.getElementById("areaCode");
+            const phoneNumber = document.getElementById("phoneNumber");
+
+            // تعيين مفتاح الولاية الافتراضي عند تحميل الصفحة
+            phoneNumber.value = areaCode.value;
+
+            // عند تغيير مفتاح الولاية، تحديث الرقم
+            areaCode.addEventListener("change", function () {
+                phoneNumber.value = areaCode.value; // تعيين الحقل بمفتاح الولاية
+            });
+        });
+
+//     document.addEventListener("DOMContentLoaded", function () {
+//    const areaCode = document.getElementById("areaCode");
+//    const phoneNumber = document.getElementById("phoneNumber");
+//    const form = document.querySelector("form"); // استبدل "form" بمحدد النموذج الخاص بك إذا كان لديك أكثر من نموذج
+
+//    // تحديث الرقم مع رمز الدولة عند تغيير الرمز
+//    areaCode.addEventListener("change", function () {
+//        updatePhoneNumber();
+//    });
+
+//    // تحديث الرقم مع رمز الدولة عند إدخال الرقم
+//    phoneNumber.addEventListener("input", function () {
+//        updatePhoneNumber();
+//    });
+
+//    // منع الإرسال إذا كان الرقم غير صالح
+//    form.addEventListener("submit", function (event) {
+//        if (!isPhoneNumberValid()) {
+//            event.preventDefault(); // منع إرسال النموذج
+//            alert("Please enter a valid phone number.");
+//        }
+//    });
+
+//    function updatePhoneNumber() {
+//        const code = areaCode.value;
+//        const number = phoneNumber.value.replace(new RegExp(`^${code}`), "").trim(); // إزالة الرمز القديم
+//        phoneNumber.value = `${code} ${number}`; // دمج الرمز الجديد
+//    }
+
+//    function isPhoneNumberValid() {
+//        const code = areaCode.value;
+//        const number = phoneNumber.value.replace(code, "").trim(); // إزالة رمز الدولة للتحقق فقط من الرقم
+//        const phoneRegex = /^[0-9]{6,15}$/; // التحقق من الأرقام بين 6 و15 رقم
+//        return phoneRegex.test(number); // صحيح إذا كان الرقم يطابق النمط
+//    }
+//});
+
+
+ 
+        document.addEventListener("DOMContentLoaded", function () {
+            const areaCode = document.getElementById("areaCode");
+            const phoneNumber = document.getElementById("phoneNumber");
+            const errorSpan = document.getElementById("phoneError");
+            const form = document.querySelector("form"); // استبدل "form" بمحدد النموذج الخاص بك إذا لزم
+
+            // تحديث الرقم مع رمز الدولة
+            areaCode.addEventListener("change", function () {
+                phoneNumber.value = areaCode.value;
+            });
+
+            // تحديث الرقم عند الكتابة
+            phoneNumber.addEventListener("input", function () {
+                let currentValue = phoneNumber.value;
+
+                // إذا كانت القيمة فارغة، إعادة مفتاح الدولة فقط
+                if (currentValue.trim() === '') {
+                    phoneNumber.value = areaCode.value;
+                    return;
+                }
+
+                // إزالة أي تكرارات لمفتاح الدولة داخل النص
+                let sanitizedValue = currentValue.replace(new RegExp(`^(${areaCode.value})+`), areaCode.value);
+                phoneNumber.value = sanitizedValue;
+
+                clearError(); // إزالة رسالة الخطأ عند الكتابة
+            });
+
+            // منع الإرسال إذا كان الرقم غير صالح
+            form.addEventListener("submit", function (event) {
+                if (!isPhoneNumberValid()) {
+                    event.preventDefault(); // منع إرسال النموذج
+                    showError("Please enter a valid phone number."); // عرض رسالة الخطأ
+                }
+            });
+
+            // دالة لإظهار رسالة الخطأ
+            function showError(message) {
+                errorSpan.textContent = message;
+            }
+
+            // دالة لإزالة رسالة الخطأ
+            function clearError() {
+                errorSpan.textContent = "";
+            }
+
+            // التحقق من صلاحية رقم الهاتف
+            function isPhoneNumberValid() {
+                const code = areaCode.value;
+                const number = phoneNumber.value.replace(code, "").trim(); // إزالة رمز الدولة للتحقق فقط من الرقم
+                const phoneRegex = /^[0-9]{6,15}$/; // التحقق من الأرقام بين 6 و15 رقم
+                return phoneRegex.test(number);
+            }
+        });
+
+
+       
+      
+     
+
+
+    </script>
+}

@@ -1,0 +1,218 @@
+﻿@model towing_services.Models.OrderTrackingViewModel
+<style>
+    body {
+        background-color: #f0f0f0;
+    }
+    /* تنسيق القائمة المنسدلة */
+    .nav-item .dropdown-menu {
+        background-color: #f0f0f0; /* لون الخلفية */
+        border: none;
+        border-radius: 20px; /* زوايا مستديرة */
+        box-shadow: 0px 8px 15px rgb(6 34 57 / 0.10); /* ظل ناعم */
+        padding: 4px;
+        /* إبعاد القائمة عن الحافة اليمنى */
+        margin-left: -50px; /* إضافة مسافة من الحافة اليمنى */
+    }
+
+
+    /* عناصر القائمة المنسدلة */
+    .dropdown-item {
+        font-size: 18px;
+        color: #333;
+        padding: 10px 20px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+        /* تأثير عند المرور على عنصر القائمة المنسدلة */
+        .dropdown-item:hover {
+            background-color: #0b2644; /* لون الخلفية عند المرور */
+            color: #fff; /* لون النص عند المرور */
+            transform: scale(1.05); /* تكبير بسيط */
+        }
+
+    /* تصميم السهم */
+    .nav-link.dropdown-toggle::after {
+        content: ' ▼'; /* إضافة سهم */
+        font-size: 12px;
+        color: inherit; /* نفس لون النص */
+        margin-left: 5px;
+        transition: transform 0.3s ease;
+    }
+
+    /* دوران السهم عند الفتح */
+    .nav-link.dropdown-toggle[aria-expanded="true"]::after {
+        transform: rotate(180deg);
+    }
+
+    /* تأثير الظهور التدريجي للقائمة */
+    .nav-item .dropdown-menu {
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+        /* عند عرض القائمة */
+        .nav-item .dropdown-menu.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    strong {
+        color: #0d0946
+    }
+
+    .card {
+        background: linear-gradient(135deg, #f4f4f4, #ffffff);
+        border-radius: 10px;
+        box-shadow: 4px 4px 10px rgba(255, 0, 150, 0.4), -4px -4px 10px rgba(0, 255, 200, 0.4);
+        text-align: center
+    }
+
+    .responsive-text {
+        font-size: 1.60rem;
+        line-height: 1.8;
+        color: #1e1d24
+    }
+
+    @@media (max-width: 576px) {
+        .responsive-text {
+            font-size: 1rem;
+            line-height: 2;
+        }
+     
+    }
+    /* استجابة للشاشات الصغيرة */
+    @@media (max-width: 915px) {
+        .hero-text span {
+            font-size: 3rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .hero-text  {
+            font-size: 0.55rem;
+        }
+     
+    }
+    /*************************************/
+    .hero-text {
+        font-weight: bold;
+        text-align: center;
+        padding: 10px;
+        word-wrap: break-word;
+    }
+
+        .hero-text span {
+            opacity: 0;
+            display: inline-block;
+            transform: translateY(-30px);
+            animation: showLetter 1s ease-out forwards;
+            font-size: 3rem;
+            color: #104263;
+        }
+
+            .hero-text span:nth-child(1) {
+                animation-delay: 0s;
+                color:#00050a
+            }
+
+            .hero-text span:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .hero-text span:nth-child(3) {
+                animation-delay: 0.4s;
+            }
+
+            .hero-text span:nth-child(4) {
+                animation-delay: 0.6s;
+            }
+
+            .hero-text span:nth-child(5) {
+                animation-delay: 0.8s;
+            }
+
+            .hero-text span:nth-child(6) {
+                animation-delay: 1s;
+            }
+
+            .hero-text span:nth-child(7) {
+                animation-delay: 1.2s;
+                color: #00050a
+            }
+
+            .hero-text span:nth-child(8) {
+                animation-delay: 1.4s;
+            }
+
+            .hero-text span:nth-child(9) {
+                animation-delay: 1.6s;
+            }
+
+            .hero-text span:nth-child(10) {
+                animation-delay: 1.8s;
+            }
+
+            .hero-text span:nth-child(11) {
+                animation-delay: 2s;
+            }
+
+            .hero-text span:nth-child(12) {
+                animation-delay: 2.2s;
+            }
+
+            .hero-text span:nth-child(13) {
+                animation-delay: 2.4s;
+            }
+
+            .hero-text span:nth-child(14) {
+                animation-delay: 2.6s;
+            }
+
+    .space {
+        width: 1px;
+    }
+
+    @@keyframes showLetter {
+        0% {
+            opacity: 0;
+            transform: translateY(-90px);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+
+<div style="padding:20px">
+
+</div>
+
+<h2 class="text-center hero-text " aria-label="Order Tracking">
+    <span>O</span><span>r</span><span>d</span><span>e</span><span>r</span>
+    <span class="space"></span>
+    <span>T</span><span>r</span><span>a</span><span>c</span><span>k</span><span>i</span><span>n</span><span>g</span>
+</h2>
+<div class="d-flex justify-content-center align-items-center ">
+
+    <div class="card p-5 shadow" style="border: 5px solid; border-image-source: linear-gradient(to right, #4caf50, #2196f3); border-image-slice: 6; max-width: 700px;">
+
+        <p class="responsive-text"><strong>Status:</strong>  @Model.Order.Status</p>
+        <p class="responsive-text"><strong>Customer Name:</strong> @Model.CustomerName</p>
+        <p class="responsive-text"><strong>Tracking Number:</strong> @Model.Order.TrackingNumber</p>
+        <p class="responsive-text"><strong>Vehicle Type:</strong>  @Model.Order.VehicleType</p>
+        <p class="responsive-text"><strong>Distance:</strong>  @Model.Order.Distance miles</p>
+        <p class="responsive-text"><strong>Total Cost:</strong> $ @Model.Order.TotalCost</p>
+        <p class="responsive-text"><strong>Order Date:</strong>  @Model.Order.OrderDate.ToString("f")</p>
+    </div>
+</div>
+<div style="padding:20px">
+
+</div>
+
+
+
